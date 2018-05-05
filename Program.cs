@@ -11,8 +11,7 @@ namespace stardew
             var cabins = game.Cabins;
             var cabinClone = game.CreateNewCabin();
             Console.WriteLine(cabinClone);
-            game.AddCabin(cabinClone);         
-            
+            game.AddCabin(cabinClone);                     
             game.SaveFile();
         }
 

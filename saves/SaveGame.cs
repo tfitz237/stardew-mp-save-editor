@@ -9,16 +9,31 @@ namespace stardew {
         private XDocument _doc {get;set;}
         private IEnumerable<XElement> _saveGame {get; set;}
         public SaveGame (string path) {
-            _doc = XDocument.Load(path);
-            _saveGame = _doc?.Element("SaveGame")?.Elements(); 
-            if (_saveGame == null || !_saveGame.Any()) {
+            try {
+                _doc = XDocument.Load(path);
+                _saveGame = _doc?.Element("SaveGame")?.Elements(); 
+                if (_saveGame == null || !_saveGame.Any()) {
+                    throw new Exception("Game file not parsed correctly");
+                }
+            } catch {
                 throw new Exception("Game file not parsed correctly");
             }
         }
         
-        public XElement Farm { get => _saveGame.First(x => x.Name == "locations").Elements().Single(x => x.Attribute(ns + "type")?.Value == "Farm"); }
+        public XElement Farm { get => _saveGame
+            .First(x => x.Name == "locations")
+            .Elements()
+            .Single(x =>
+                x.Attribute(ns + "type")?.Value == "Farm"); 
+        }
         
-        public IEnumerable<XElement> Cabins { get => Farm.Element("buildings").Elements().Where(x => x.Element("indoors").Attribute(ns + "type")?.Value == "Cabin"); }               
+        public IEnumerable<XElement> Cabins { get => Farm
+            .Element("buildings")
+            .Elements()
+            .Where(x => 
+                x.Element("indoors")
+                .Attribute(ns + "type")?.Value == "Cabin"); 
+            }               
         
 
         public void AddCabin(XElement cabin) {
