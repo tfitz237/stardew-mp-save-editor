@@ -8,6 +8,7 @@ namespace stardew {
         XNamespace ns = "http://www.w3.org/2001/XMLSchema-instance";
         private XDocument _doc {get;set;}
         private IEnumerable<XElement> _saveGame {get; set;}
+        private Random rand = new Random();
         public SaveGame (string path) {
             try {
                 _doc = XDocument.Load(path);
@@ -15,8 +16,8 @@ namespace stardew {
                 if (_saveGame == null || !_saveGame.Any()) {
                     throw new Exception("Game file not parsed correctly");
                 }
-            } catch {
-                throw new Exception("Game file not parsed correctly");
+            } catch(Exception exception) {
+                throw exception;
             }
         }
         
@@ -46,6 +47,19 @@ namespace stardew {
                                         .Element("name").IsEmpty
                                     ); 
             return new XElement(blankCabin);                
+        }
+        public XElement ReplaceCabinName(XElement cabin) {
+            var uniqueName = String.Format("Cabin{0}", Guid.NewGuid().ToString());
+            cabin.Element("indoors").Element("uniqueName").Value = uniqueName;
+            cabin.Element("indoors").Element("farmhand").Element("homeLocation").Value = uniqueName;
+            return cabin;
+        }
+        public XElement ReplaceMultiplayerId(XElement cabin) {
+            byte[] buffer = new byte[8];
+            rand.NextBytes(buffer);
+            var uniqueMultiplayerId = BitConverter.ToInt64(buffer, 0);
+            cabin.Element("indoors").Element("farmhand").Element("UniqueMultiplayerID").Value = uniqueMultiplayerId.ToString();
+            return cabin;
         }
 
         public void SaveFile() {
