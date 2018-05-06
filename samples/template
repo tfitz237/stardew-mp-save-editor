@@ -1634,7 +1634,7 @@
 				<bobber />
 				<saveTime>0</saveTime>
 				<isCustomized>false</isCustomized>
-				<homeLocation>Cabin0f0dda9a-7629-4398-9210-96893f816a1c</homeLocation>
+				<homeLocation />
 				<daysMarried>0</daysMarried>
 				<movementMultiplier>0.01</movementMultiplier>
 				<money>500</money>
@@ -1643,7 +1643,7 @@
 				<hasRustyKey>false</hasRustyKey>
 				<hasSkullKey>false</hasSkullKey>
 				<canUnderstandDwarves>false</canUnderstandDwarves>
-				<UniqueMultiplayerID>8560708807083493444</UniqueMultiplayerID>
+				<UniqueMultiplayerID />
 			</farmhand>
 		</indoors>
 		<tileX>35</tileX>
