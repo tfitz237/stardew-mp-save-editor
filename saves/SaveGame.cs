@@ -28,15 +28,17 @@ namespace stardew {
                 x.Attribute(ns + "type")?.Value == "Farm"); 
         }
         
-        public IEnumerable<XElement> Cabins { get => Farm
+        public IEnumerable<XElement> Buildings { get => Farm
             .Element("buildings")
-            .Elements()
+            .Elements();
+        }
+
+        public IEnumerable<XElement> Cabins { get => Buildings
             .Where(x => 
                 x.Element("indoors")
                 .Attribute(ns + "type")?.Value == "Cabin"); 
-            }               
+        }               
         
-
         public void AddCabin(XElement cabin) {
             Farm.Element("buildings").Add(cabin);
         }
@@ -46,25 +48,32 @@ namespace stardew {
                                         .Element("farmhand")
                                         .Element("name").IsEmpty
                                     ); 
-            return new XElement(blankCabin);                
+            return new XElement(blankCabin);
         }
+
         public XElement ReplaceCabinName(XElement cabin) {
             var uniqueName = String.Format("Cabin{0}", Guid.NewGuid().ToString());
+            Console.WriteLine(uniqueName);
             cabin.Element("indoors").Element("uniqueName").Value = uniqueName;
-            cabin.Element("indoors").Element("farmhand").Element("homeLocation").Value = uniqueName;
+            cabin.Element("indoors")
+                .Element("farmhand")
+                .Element("homeLocation").Value = uniqueName;
             return cabin;
         }
+
         public XElement ReplaceMultiplayerId(XElement cabin) {
             byte[] buffer = new byte[8];
             rand.NextBytes(buffer);
             var uniqueMultiplayerId = BitConverter.ToInt64(buffer, 0);
-            cabin.Element("indoors").Element("farmhand").Element("UniqueMultiplayerID").Value = uniqueMultiplayerId.ToString();
+            cabin.Element("indoors")
+                .Element("farmhand")
+                .Element("UniqueMultiplayerID")
+                .Value= uniqueMultiplayerId.ToString();
             return cabin;
         }
 
         public void SaveFile() {
             _doc.Save("./saves/JustSaved.xml");
         }
-      
     }
 }

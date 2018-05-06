@@ -5,15 +5,21 @@ namespace stardew
     class Program
     {
         static void Main(string[] args)
-        {
-            var path = args.Count() > 0 ? args[0].Replace("\\", "/").TrimEnd() : "./samples/TemplateNa_185230783";
+        {   
+            var newPlayers = args.Count() > 0 ? Int32.Parse(args[0]) : 1;
+            var path = args.Count() > 1 ? args[1].Replace("\\", "/").TrimEnd() : "./samples/TemplateNa_185230783";
             var game = new SaveGame(path);
-            var cabins = game.Cabins;
-            var cabinClone = game.CreateNewCabin();
-            cabinClone = game.ReplaceCabinName(cabinClone);
-            cabinClone = game.ReplaceMultiplayerId(cabinClone);
-            Console.WriteLine(cabinClone);
-            game.AddCabin(cabinClone);
+            
+            while (newPlayers > 0) {
+                var cabins = game.Cabins;
+                var cabinClone = game.CreateNewCabin();
+                cabinClone = game.ReplaceCabinName(cabinClone);
+                cabinClone = game.ReplaceMultiplayerId(cabinClone);
+                //Console.WriteLine(cabinClone);
+                game.AddCabin(cabinClone);
+                newPlayers--;
+            }
+            
             game.SaveFile();
         }
 
