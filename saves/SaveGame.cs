@@ -2,17 +2,22 @@ using System;
 using System.Xml.Linq;
 using System.Linq;
 using System.Collections.Generic;
-
+using System.IO;
 namespace stardew {
      public class SaveGame {
         XNamespace ns = "http://www.w3.org/2001/XMLSchema-instance";
         private XDocument _doc {get;set;}
+        private XDocument _originalDoc {get; set;}
         private IEnumerable<XElement> _saveGame {get; set;}
+        private string _path {get;set;}
         private Random random = new Random();
         private String templatePath = "samples\\template";
         public SaveGame (string path) {
             try {
+                _path = path;
                 _doc = XDocument.Load(path);
+                _originalDoc =XDocument.Load(path);
+
                 _saveGame = _doc?.Element("SaveGame")?.Elements(); 
                 if (_saveGame == null || !_saveGame.Any()) {
                     throw new Exception("Game file not parsed correctly");
@@ -21,6 +26,8 @@ namespace stardew {
                 throw exception;
             }
         }
+
+        public string FileName { get => Path.GetFileName(_path);}
         
         public XElement Host { get => _saveGame
             .First(x => x.Name == "player");
@@ -56,10 +63,9 @@ namespace stardew {
         }
 
         public XElement ReplaceCabinName(XElement cabin) {
-            var uniqueName = String.Format("Cabin{0}", Guid.NewGuid().ToString());
-            Console.WriteLine(uniqueName);
+            var uniqueName = $"Cabin{Guid.NewGuid()}";
             cabin.Element("indoors").Element("uniqueName").Value = uniqueName;
-            getFarmhand(cabin)
+            GetFarmhand(cabin)
                 .Element("homeLocation").Value = uniqueName;
             return cabin;
         }
@@ -68,24 +74,25 @@ namespace stardew {
             byte[] buffer = new byte[8];
             random.NextBytes(buffer);
             var uniqueMultiplayerId = BitConverter.ToInt64(buffer, 0);
-            getFarmhand(cabin)
+            GetFarmhand(cabin)
                 .Element("UniqueMultiplayerID")
                 .Value= uniqueMultiplayerId.ToString();
             return cabin;
         }
 
         private XElement UpdateFarmhand(XElement cabin) {
-            var farmhand = getFarmhand(cabin);
+            var farmhand = GetFarmhand(cabin);
             farmhand.Element("farmName").Value = Host.Element("farmName").Value;
             farmhand.Element("money").Value = Host.Element("money").Value;
             return cabin;
         }
             
         public void SaveFile() {
-            _doc.Save("./saves/JustSaved.xml");
+            _originalDoc.Save($"./saves/{FileName}_ORIGINAL.xml");
+            _doc.Save($"./saves/{FileName}_{DateTime.Now.ToString("MMddyyHHmm")}.xml");
         }
 
-        private XElement getFarmhand(XElement cabin) {
+        private XElement GetFarmhand(XElement cabin) {
             return cabin.Element("indoors")
                 .Element("farmhand");
         }
