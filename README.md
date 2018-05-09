@@ -20,11 +20,11 @@ Shows a list of the commands avaiable
 Program.exe
 ```
 #### AddPlayers
-Will add <Number of New Player Slots> to a \<Save File>
+Will add \<Number of New Player Slots> to a \<Save File>
   
 If arguments are not passed, user will be prompted for them
 ```
-Program.exe  AddPlayers -p=\<Number of New Player Slots> -s=\<Path to save file>
+Program.exe  AddPlayers -p=<Number of New Player Slots> -s=<Path to save file>
 ```
 
 #### ChangeHost
@@ -32,7 +32,7 @@ Will change the host in a \<Save File> with one of the farmhands
 
 Farmhand selection will occur
 ```
-Program.exe  ChangeHost -s=\<Path to save file>
+Program.exe  ChangeHost -s=<Path to save file>
 ```
 Any missing arguments will result in prompting for information
 
