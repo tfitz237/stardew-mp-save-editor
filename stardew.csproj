@@ -3,10 +3,16 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+     <RuntimeIdentifiers>win10-x64;ubuntu.16.10-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ManyConsole" Version="1.0.0.4" />
   </ItemGroup>
-
+  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <None Update="template/template" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <None Update="template/template" CopyToOutputDirectory="PreserveNewest"  />
+  </ItemGroup>
 </Project>

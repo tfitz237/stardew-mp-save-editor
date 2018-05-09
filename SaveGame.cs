@@ -11,7 +11,7 @@ namespace stardew {
         private IEnumerable<XElement> _saveGame {get; set;}
         private string _path {get;set;}
         private Random random = new Random();
-        private String templatePath = "template/template";
+        private String templatePath = AppContext.BaseDirectory + "\\template\\template";
         public SaveGame (string path) {
             try {
                 _path = path;
@@ -103,6 +103,7 @@ namespace stardew {
         }
             
         public void SaveFile() {
+            System.IO.Directory.CreateDirectory("saves");
             _originalDoc.Save($"./saves/{FileName}_ORIGINAL.xml");
             _doc.Save($"./saves/{FileName}_{DateTime.Now.ToString("MMddyyHHmm")}.xml");
         }
