@@ -11,7 +11,7 @@ namespace stardew {
         private IEnumerable<XElement> _saveGame {get; set;}
         private string _path {get;set;}
         private Random random = new Random();
-        private String templatePath = "samples\\template";
+        private String templatePath = "template/template";
         public SaveGame (string path) {
             try {
                 _path = path;
@@ -77,6 +77,13 @@ namespace stardew {
             GetFarmhand(cabin)
                 .Element("UniqueMultiplayerID")
                 .Value= uniqueMultiplayerId.ToString();
+            return cabin;
+        }
+
+        public XElement GetCabinType(XElement cabin) {
+            List<String> cabinTypes = new List<String>(new String[] {"Log Cabin", "Stone Cabin", "Plank Cabin"});
+            var cabinType = cabinTypes[random.Next(0, 3)];
+            cabin.Element("buildingType").Value = cabinType;
             return cabin;
         }
 
