@@ -65,12 +65,7 @@ namespace stardew {
                 var game = new SaveGame(saveFilePath);
                 while (newCabinCount > 0) {
                     var cabins = game.Cabins;
-                    var cabinClone = game.CreateNewCabin();
-                    cabinClone = game.ReplaceCabinName(cabinClone);
-                    cabinClone = game.ReplaceMultiplayerId(cabinClone);
-                    cabinClone = game.GetCabinType(cabinClone);
-                    //Console.WriteLine(cabinClone);
-                    game.AddCabin(cabinClone);
+                    game.CreateNewCabin();
                     newCabinCount--;
                 }
 
