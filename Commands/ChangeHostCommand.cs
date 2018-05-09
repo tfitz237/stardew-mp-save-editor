@@ -1,12 +1,11 @@
 using System;
 using ManyConsole;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using System.Text.RegularExpressions;
 
-namespace StardewValley.MPSaveEditor.Commands {
+namespace StardewValley.MPSaveEditor.Commands
+{
 
     public class ChangeHostCommand : ConsoleCommand {
 

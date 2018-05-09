@@ -1,10 +1,9 @@
-using System;
 using System.Xml.Linq;
 using System.Linq;
 using System.Collections.Generic;
-using System.IO;
 
-namespace StardewValley.MPSaveEditor.Models {
+namespace StardewValley.MPSaveEditor.Models
+{
     public class GameObjects {
         XNamespace ns = "http://www.w3.org/2001/XMLSchema-instance";
         public IEnumerable<XElement> Objects { get; set; }
