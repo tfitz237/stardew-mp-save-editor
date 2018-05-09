@@ -51,6 +51,14 @@ namespace stardew {
                 .Attribute(ns + "type")?.Value == "Cabin"); 
         }
         
+        public IEnumerable<XElement> Farmhands { 
+            get => Cabins.Select(x => x.Element("indoors").Element("farmhand"));
+        }
+
+        public IEnumerable<string> FarmhandNames {
+            get => Farmhands.Select(x => x.Element("name").Value);
+        }
+
         public void AddCabin(XElement cabin) {
             Farm.Element("buildings").Add(cabin);
         }
@@ -99,9 +107,27 @@ namespace stardew {
             _doc.Save($"./saves/{FileName}_{DateTime.Now.ToString("MMddyyHHmm")}.xml");
         }
 
-        private XElement GetFarmhand(XElement cabin) {
+        public XElement GetFarmhand(XElement cabin) {
             return cabin.Element("indoors")
                 .Element("farmhand");
+        }
+
+        public XElement FindCabinByFarmhand(XElement farmhand) {
+            return Cabins.FirstOrDefault(x => x.Element("indoors").Element("farmhand").Element("name").Value == farmhand.Element("name").Value);
+        }
+
+        public XElement GetFarmhandByName(string name) {
+            return Farmhands.FirstOrDefault(x => x.Element("name").Value == name);
+        }
+
+
+        public void SwitchHost(XElement farmhand) {
+            var host = new XElement(Host);
+            farmhand = new XElement(farmhand);
+            var cabin = FindCabinByFarmhand(farmhand);
+            Host.ReplaceAll(farmhand.Nodes());
+            cabin.Element("indoors").Element("farmhand").ReplaceAll(host.Nodes());
+            
         }
     }
 }
