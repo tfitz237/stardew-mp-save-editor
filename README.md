@@ -2,7 +2,7 @@
 For those of you that need more than four players in a single game of Stardew Valley.
 
 ## Getting Started
-Running this application will be as simple as double clicking the EXE or running from command line (to supply arguments)
+Run this application from a terminal, all necessary runtimes and dependencies will be included in the release.
 
 ### Prerequisites
 To run from source, you must have [Dotnet Core CLI](https://docs.microsoft.com/en-us/dotnet/core/tools/?tabs=netcore) installed
