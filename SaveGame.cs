@@ -44,7 +44,7 @@ namespace StardewValley.MPSaveEditor {
         
         public IEnumerable<XElement> Cabins => Buildings
             .Where(x => 
-                x.Element("indoors")
+                x.Element("indoors")?
                  .Attribute(ns + "type")?.Value == "Cabin"); 
                 
         public IEnumerable<XElement> Farmhands => Cabins
@@ -53,6 +53,7 @@ namespace StardewValley.MPSaveEditor {
                  .Element("farmhand"));
         
         public IEnumerable<string> FarmhandNames => Farmhands
+        .Where(x => !x.Element("name").IsEmpty)
             .Select(x => 
                 x.Element("name").Value);
         
@@ -88,6 +89,8 @@ namespace StardewValley.MPSaveEditor {
         public void SwitchHost(XElement farmhand) {
             var host = new XElement(Host);
             farmhand = new XElement(farmhand);
+            farmhand.Element("eventsSeen").ReplaceAll(host.Element("eventsSeen").Nodes());
+            farmhand.Element("caveChoice").Value = host.Element("caveChoice").Value;
             var cabin = FindCabinByFarmhand(farmhand);
             Host.ReplaceAll(farmhand.Nodes());
             cabin.Element("indoors").Element("farmhand").ReplaceAll(host.Nodes());           
