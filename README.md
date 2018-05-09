@@ -9,6 +9,7 @@ To run from source, you must have [Dotnet Core CLI](https://docs.microsoft.com/e
 
 ### Usage
 Run the executable from command line.
+
 Note: A copy of the original file and the modified file will be placed in the saves subdirectory.
 
 ### Run from command-line:
@@ -20,6 +21,7 @@ Program.exe
 ```
 #### AddPlayers
 Will add <Number of New Player Slots> to a \<Save File>
+  
 If arguments are not passed, user will be prompted for them
 ```
 Program.exe  AddPlayers -p=\<Number of New Player Slots> -s=\<Path to save file>
@@ -27,6 +29,7 @@ Program.exe  AddPlayers -p=\<Number of New Player Slots> -s=\<Path to save file>
 
 #### ChangeHost
 Will change the host in a \<Save File> with one of the farmhands
+
 Farmhand selection will occur
 ```
 Program.exe  ChangeHost -s=\<Path to save file>
