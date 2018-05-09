@@ -1,4 +1,4 @@
-# Even More Multiplayer
+# Stardew Valley Even More Multiplayer
 For those of you that need more than four players in a single game of Stardew Valley.
 ## Usage
 ### Run from command-line:
