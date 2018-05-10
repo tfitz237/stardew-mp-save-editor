@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ILLink.Tasks" Version="0.1.4-preview-1184387" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.2" />
   </ItemGroup>
   
