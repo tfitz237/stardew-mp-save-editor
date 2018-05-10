@@ -4,23 +4,19 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
-
+using McMaster.Extensions.CommandLineUtils;
 
 namespace StardewValley.MPSaveEditor.Commands {
 
+    [Command(Name = "AddPlayers", Description = "Add Players", ThrowOnUnexpectedArgument = false)]
     public class AddPlayersCommand {
 
         private const int Success = 0;
         private const int Failure = 2;
 
-        public int newCabinCount;
+        public int newCabinCount {get; set;}
+        
         public string saveFilePath { get; set; }
-        public AddPlayersCommand(string cabinCount, string filePath) {
-            Int32.TryParse(cabinCount, out newCabinCount);
-            saveFilePath = filePath?.Replace("\\", "/")?.TrimEnd();
-            
-        }
-
         public int GetAddedPlayerCount() {
             String userSelection = "";
             Console.WriteLine("How many player slots would you like to add? ");
@@ -31,29 +27,29 @@ namespace StardewValley.MPSaveEditor.Commands {
         }
         
         public static String GetSaveFile(String path) {
-            String userSelection = "";
-            Dictionary<String, String> saveFiles = new Dictionary<String, String>();
-            
-            Console.WriteLine("Select a save file: ");
+            int userSelection = -1;
+            Dictionary<int, String> saveFiles = new Dictionary<int, String>();
+            Console.WriteLine("---------");
+            Console.WriteLine("Save Files");
             while(!saveFiles.ContainsKey(userSelection)) {
-                saveFiles = new Dictionary<String, String>();
+                saveFiles = new Dictionary<int, String>();
                 int fileCount = 0;
                 foreach(String saveFolder in Directory.GetDirectories(path)) {
                     fileCount++;
                     String saveFileName = Regex.Matches(saveFolder, @"[^\\]*$").First().ToString();
                     String saveFilePath = String.Format("{0}/{1}", saveFolder, saveFileName);
-                    saveFiles.Add(fileCount.ToString(), saveFilePath);
+                    saveFiles.Add(fileCount, saveFilePath);
                     Console.WriteLine(String.Format("{0}. {1}", fileCount, saveFileName));
                 }
-                userSelection = Console.ReadLine();
+                userSelection = Prompt.GetInt("Select a save file:", 0);
             }
 
             return saveFiles[userSelection];
         }
-        public int Run() {
+        public int OnExecute() {
             try {
-                saveFilePath = saveFilePath ?? GetSaveFile(String.Format("C:/Users/{0}/AppData/Roaming/StardewValley/Saves", Environment.UserName));
-                newCabinCount = newCabinCount != 0 ? newCabinCount : GetAddedPlayerCount();
+                saveFilePath = GetSaveFile(String.Format("C:/Users/{0}/AppData/Roaming/StardewValley/Saves", Environment.UserName));
+                newCabinCount = Prompt.GetInt("How many player slots would you like to add? ", 1);
                 var game = new SaveGame(saveFilePath);
                 while (newCabinCount > 0) {
                     var cabins = game.Cabins;

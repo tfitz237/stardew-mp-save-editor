@@ -2,26 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using McMaster.Extensions.CommandLineUtils;
 
 namespace StardewValley.MPSaveEditor.Commands
 {
-
+    [Command(Name = "AddPlayers", Description = "Add Players", ThrowOnUnexpectedArgument = false)]
     public class ChangeHostCommand {
 
         private const int Success = 0;
         private const int Failure = 2;
 
         public string saveFilePath { get; set; }
-        public ChangeHostCommand(string saveFilePath) {
-
-        }
 
          public XElement SelectFarmhand(SaveGame saveGame) {
-            string userSelection = "null";
-            int farmhandNumber;
             Dictionary<string, string> saveFiles = new Dictionary<String, String>();
-            
-            Console.WriteLine("Select a farmhand: ");
+            Console.WriteLine("---------");
+            Console.WriteLine("Farmhand: ");
             var farmhands = saveGame.Farmhands;            
             var farmhandNames = saveGame.FarmhandNames;
             
@@ -31,17 +27,15 @@ namespace StardewValley.MPSaveEditor.Commands
                 farmhandCount++;
                 Console.WriteLine(String.Format("{0}. {1}", farmhandCount, name));
             }
-            while (!Int32.TryParse(userSelection, out farmhandNumber)) {
-                userSelection = Console.ReadLine();
-            }
+            int farmhandNumber = Prompt.GetInt("Select a farmhand:", 1);
             
 
             return saveGame.GetFarmhandByName(farmhandNames.ElementAt(farmhandNumber - 1));
         }       
 
-        public int Run() {
+        public int OnExecute() {
             try {
-                saveFilePath = saveFilePath ?? AddPlayersCommand.GetSaveFile(String.Format("C:/Users/{0}/AppData/Roaming/StardewValley/Saves", Environment.UserName));
+                saveFilePath = AddPlayersCommand.GetSaveFile(String.Format("C:/Users/{0}/AppData/Roaming/StardewValley/Saves", Environment.UserName));
                 var saveGame = new SaveGame(saveFilePath);
                 var farmhand = SelectFarmhand(saveGame);
                 saveGame.SwitchHost(farmhand);
