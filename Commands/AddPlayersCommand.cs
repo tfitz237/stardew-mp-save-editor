@@ -53,7 +53,7 @@ namespace StardewValley.MPSaveEditor.Commands {
         public int Run() {
             try {
                 saveFilePath = saveFilePath ?? GetSaveFile(String.Format("C:/Users/{0}/AppData/Roaming/StardewValley/Saves", Environment.UserName));
-                newCabinCount = newCabinCount == 0 ? newCabinCount : GetAddedPlayerCount();
+                newCabinCount = newCabinCount != 0 ? newCabinCount : GetAddedPlayerCount();
                 var game = new SaveGame(saveFilePath);
                 while (newCabinCount > 0) {
                     var cabins = game.Cabins;
