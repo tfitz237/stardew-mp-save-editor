@@ -7,12 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ManyConsole" Version="1.0.0.4" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.2" />
   </ItemGroup>
+  
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <None Update="template/template" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
     <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <None Update="template/template" CopyToOutputDirectory="PreserveNewest"  />
+    <None Update="template/template" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

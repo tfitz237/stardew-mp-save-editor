@@ -1,5 +1,4 @@
 using System;
-using ManyConsole;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,27 +8,19 @@ using System.Text.RegularExpressions;
 
 namespace StardewValley.MPSaveEditor.Commands {
 
-    public class AddPlayersCommand : ConsoleCommand {
+    public class AddPlayersCommand {
 
         private const int Success = 0;
         private const int Failure = 2;
 
-        public int? newCabinCount { get; set;}
+        public int newCabinCount;
         public string saveFilePath { get; set; }
-        public AddPlayersCommand() {
-            IsCommand("AddPlayers", "Add Players to Save File");
-            HasLongDescription("Add more players/cabins to a MP game. Specify # of players and save file");
-            HasOption("p|players=", "Specify the number of players  to add to the MP save",
-            t => newCabinCount = t != null ? 
-                Convert.ToInt16(t) : 
-                (int?)null
-            );
-            HasOption("s|save=", "Save File Path", 
-            s => saveFilePath = s != null ? 
-                s.Replace("\\", "/").TrimEnd() : 
-                null
-            );
+        public AddPlayersCommand(string cabinCount, string filePath) {
+            Int32.TryParse(cabinCount, out newCabinCount);
+            saveFilePath = filePath?.Replace("\\", "/")?.TrimEnd();
+            
         }
+
         public int GetAddedPlayerCount() {
             String userSelection = "";
             Console.WriteLine("How many player slots would you like to add? ");
@@ -59,10 +50,10 @@ namespace StardewValley.MPSaveEditor.Commands {
 
             return saveFiles[userSelection];
         }
-        public override int Run(string[] remainingArguments) {
+        public int Run() {
             try {
                 saveFilePath = saveFilePath ?? GetSaveFile(String.Format("C:/Users/{0}/AppData/Roaming/StardewValley/Saves", Environment.UserName));
-                newCabinCount = newCabinCount ?? GetAddedPlayerCount();
+                newCabinCount = newCabinCount == 0 ? newCabinCount : GetAddedPlayerCount();
                 var game = new SaveGame(saveFilePath);
                 while (newCabinCount > 0) {
                     var cabins = game.Cabins;
