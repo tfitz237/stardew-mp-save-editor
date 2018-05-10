@@ -1,3 +1,4 @@
+using System;
 using System.Xml.Linq;
 using System.Linq;
 using System.Collections.Generic;
@@ -50,22 +51,19 @@ namespace StardewValley.MPSaveEditor.Models
         }
 
         public bool CheckSquare(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2) {
-            for(var a = x1; a < x1 + width1; a++) {
-                for (var b = x2; b < x2 + width2; b++) {
-                    if (a == b) {
-                        return false;
-                    }
-                }
-            }
-            for(var a = y1; a < y1 + height1; a++) {
-                for (var b = y2; b < y2 + height2; b++) {
-                    if (a == b) {
-                        return false;
-                    }
-                }
-            }
+            // make sure 1st x, y doesn't overlap with 2nd
+    
+            
+            var x1Range = Enumerable.Range(x1, x1 + width1).ToList();
+            var x2Range = Enumerable.Range(x2, x2 + width2).ToArray();
+
+            var y1Range = Enumerable.Range(y1, y1 + width1).ToArray();
+            var y2Range = Enumerable.Range(y2, x2 + width2).ToArray();
+
+            var xyRange1 = x1Range.SelectMany(g => y1Range.Select(c => new Tuple<int, int>(g, c)));
+            var xyRange2 = x2Range.SelectMany(g => y2Range.Select(c => new Tuple<int, int>(g, c)));
+            
             return true;
         }
-
     }
 }

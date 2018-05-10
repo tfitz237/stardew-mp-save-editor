@@ -1,5 +1,5 @@
 .vscode/
 bin/
 obj/
-saves/*
-out/
+Stardew.MPSaveEditor/saves/*
+Stardew.MPSaveEditor/out/
