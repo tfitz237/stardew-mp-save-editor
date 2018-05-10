@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using McMaster.Extensions.CommandLineUtils;
+using StardewValley.MPSaveEditor.Models;
+using StardewValley.MPSaveEditor.Helpers;
 
 namespace StardewValley.MPSaveEditor.Commands
 {
     [Command(Name = "AddPlayers", Description = "Add Players", ThrowOnUnexpectedArgument = false)]
     public class ChangeHostCommand {
-
-        private const int Success = 0;
-        private const int Failure = 2;
-
         public string saveFilePath { get; set; }
 
          public XElement SelectFarmhand(SaveGame saveGame) {
@@ -35,19 +33,19 @@ namespace StardewValley.MPSaveEditor.Commands
 
         public int OnExecute() {
             try {
-                saveFilePath = AddPlayersCommand.GetSaveFile(String.Format("C:/Users/{0}/AppData/Roaming/StardewValley/Saves", Environment.UserName));
+                saveFilePath = CommandHelpers.GetSaveFile(String.Format("C:/Users/{0}/AppData/Roaming/StardewValley/Saves", Environment.UserName));
                 var saveGame = new SaveGame(saveFilePath);
                 var farmhand = SelectFarmhand(saveGame);
                 saveGame.SwitchHost(farmhand);
                 saveGame.SaveFile();
                 Console.Write("Done!");
                 Console.ReadLine();
-                return Success;
+                return CommandHelpers.Success;
             } 
             catch (Exception ex) {
                 Console.Error.WriteLine(ex.Message);
                 Console.Error.WriteLine(ex.StackTrace);
-                return Failure;                  
+                return CommandHelpers.Failure;                  
             }
         }
     }

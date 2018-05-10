@@ -3,9 +3,8 @@ using System.Xml.Linq;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
-using StardewValley.MPSaveEditor.Models;
 
-namespace StardewValley.MPSaveEditor {
+namespace StardewValley.MPSaveEditor.Models {
      public class SaveGame {
         XNamespace ns = "http://www.w3.org/2001/XMLSchema-instance";
         private XDocument _doc {get;set;}
