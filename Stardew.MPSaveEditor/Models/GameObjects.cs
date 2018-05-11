@@ -19,12 +19,13 @@ namespace StardewValley.MPSaveEditor.Models
         public IEnumerable<FarmObject> LogsAndRocks { get; set; }  
         public Dictionary<GameObjectTypes,IEnumerable<FarmObject>> ObjectsList { get; set;} 
 
+        public XElement Farm {get;set;}
         public GameObjects(SaveGame game) {
-            var farm = game.Farm;
-            Objects = farm.Element("objects").Elements().Select(x => new FarmObject(x, GameObjectTypes.Object));
-            Buildings = farm.Element("buildings").Elements().Select(x => new FarmObject(x, GameObjectTypes.Building));
-            Bushes = farm.Element("largeTerrainFeatures").Elements().Select(x => new FarmObject(x, GameObjectTypes.Bush));
-            Terrain = farm.Element("terrainFeatures").Elements();
+            Farm = game.Farm;
+            Objects = Farm.Element("objects").Elements().Select(x => new FarmObject(x, GameObjectTypes.Object));
+            Buildings = Farm.Element("buildings").Elements().Select(x => new FarmObject(x, GameObjectTypes.Building));
+            Bushes = Farm.Element("largeTerrainFeatures").Elements().Select(x => new FarmObject(x, GameObjectTypes.Bush));
+            Terrain = Farm.Element("terrainFeatures").Elements();
             Trees = Terrain.Where(x => x.Element("value")
                 .Element("TerrainFeature")
                 .Attribute(ns + "type")?.Value == "Tree").Select(x => new FarmObject(x, GameObjectTypes.Tree));
@@ -37,7 +38,7 @@ namespace StardewValley.MPSaveEditor.Models
             HoeDirt = Terrain.Where(x => x.Element("value")
                 .Element("TerrainFeature")
                 .Attribute(ns + "type")?.Value == "HoeDirt").Select(x => new FarmObject(x, GameObjectTypes.HoeDirt));
-            LogsAndRocks = farm.Element("resourceClumps").Elements().Select(x => new FarmObject(x, GameObjectTypes.LogsAndRocks));
+            LogsAndRocks = Farm.Element("resourceClumps").Elements().Select(x => new FarmObject(x, GameObjectTypes.LogsAndRocks));
 
             OtherBuildings = new List<FarmObject> {
                 new FarmObject(GameObjectTypes.OtherBuildings, 59, 11, 10, 6), // Farmhouse
@@ -102,7 +103,11 @@ namespace StardewValley.MPSaveEditor.Models
             var cabin = new FarmObject(GameObjectTypes.Building, x, y, c.Width, c.Height);
             var overlapLists = ObjectsList.Select(t => new KeyValuePair<GameObjectTypes, IEnumerable<Tuple<int,int,FarmObject>>>(t.Key, FindAllOverlaps(t.Value, cabin, true)));
             foreach(var list in overlapLists) {
-                ObjectsList[list.Key].ToList().RemoveAll(t => t.Element == list.Value.Select(u => u.Item3.Element));
+                foreach(var obj in list.Value) {
+                    obj.Item3.Element.Remove();
+                }
+                //ObjectsList[list.Key].ToList().RemoveAll(t => t.Element == list.Value.Select(u => u.Item3.Element));
+                
             }           
         }
 
