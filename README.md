@@ -21,24 +21,19 @@ Program.exe
 ```
 #### AddPlayers
 Will add \<Number of New Player Slots> to a \<Save File>
-  
-If arguments are not passed, user will be prompted for them
+Save File selection and player slot number will count
 ```
-Program.exe  AddPlayers -p=<Number of New Player Slots> -s=<Path to save file>
+Program.exe  AddPlayers
 ```
 
 #### ChangeHost
 Will change the host in a \<Save File> with one of the farmhands
 
-Farmhand selection will occur
+Farmhand selection and Save File selection will occur
 ```
-Program.exe  ChangeHost -s=<Path to save file>
+Program.exe  ChangeHost
 ```
 Any missing arguments will result in prompting for information
 
 #### Finding the saved game
-If you do not supply Program with a save file path, you will have to select a save file from your AppData/Roaming/Stardew Valley/Saves folder.
-
-
-
-
+The program will search for saved files in the default save location for Stardew Valley saves:  %AppData%/Roaming/Stardew Valley/Saves folder.
