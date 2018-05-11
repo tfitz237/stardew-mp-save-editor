@@ -103,10 +103,11 @@ namespace StardewValley.MPSaveEditor.Models
             var cabin = new FarmObject(GameObjectTypes.Building, x, y, c.Width, c.Height);
             var overlapLists = ObjectsList.Select(t => new KeyValuePair<GameObjectTypes, IEnumerable<Tuple<int,int,FarmObject>>>(t.Key, FindAllOverlaps(t.Value, cabin, true)));
             foreach(var list in overlapLists) {
-                // TODO: figure out which XElement this obj came from and remove it from there 
-                foreach(var obj in list.Value) {
-                    
-                    obj.Item3.Element.Remove();
+                
+                foreach(var obj in list.Value) { 
+                    if (obj.Item3.Element.Parent != null)                   
+                        obj.Item3.Element.Remove();
+
                 }
                 //ObjectsList[list.Key].ToList().RemoveAll(t => t.Element == list.Value.Select(u => u.Item3.Element));
                 
