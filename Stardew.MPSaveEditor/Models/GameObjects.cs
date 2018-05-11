@@ -174,11 +174,11 @@ namespace StardewValley.MPSaveEditor.Models
         public IEnumerable<Tuple<int,int, FarmObject>> FindAllOverlaps(IEnumerable<FarmObject> objects, FarmObject farmObject, bool onlyRemovable = false) {
             var overlapsList = new List<Tuple<int,int, FarmObject>>();
             foreach(var obj in objects) {
-                if (farmObject.CanBeRemoved) {
+                if ((onlyRemovable && obj.CanBeRemoved) || !onlyRemovable) {
                     var overlaps = FindOverlaps(obj, farmObject);
                     if (overlaps.Any()) {
                         overlapsList.AddRange(overlaps.Select(x => new Tuple<int,int,FarmObject>(x.Item1, x.Item2, obj)));
-                    }
+                    }                   
                 }
             }
             return overlapsList;
@@ -293,7 +293,7 @@ namespace StardewValley.MPSaveEditor.Models
         }
 
         public void SetTileXYRange() {
-            Enumerable.Range(TileX, Width)
+            TileXYRange = Enumerable.Range(TileX, Width)
                     .SelectMany(x =>
                         Enumerable.Range(TileY, Height)
                         .Select(y => new Tuple<int, int>(x, y))
