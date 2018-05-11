@@ -67,9 +67,22 @@ namespace StardewValley.MPSaveEditor.Models
             };
         }   
 
-        public IEnumerable<Tuple<int,int>> OptimalLocations = GenerateOptimalLocations();
-
         static public IEnumerable<Tuple<int, int>> GenerateOptimalLocations(){
+            List<Tuple<int, int>> optimalLocations = new List<Tuple<int, int>>();
+            // open space between farm and greenhouse
+            int xMin = 33; // left side of open space
+            int yMin = 10; // top of open space
+            int xMax = 57; // right side of open space
+            int yMax = 17; // bottom of open space
+            for (int i = xMin; i <= xMax; i++){
+                for (int j = yMin; j <= yMax; j++){
+                    optimalLocations.Add(new Tuple<int, int>(i, j));
+                }
+            }
+            return optimalLocations;
+        }
+
+        static public IEnumerable<Tuple<int, int>> GenerateEntireMapLocations(){
             List<Tuple<int, int>> optimalLocations = new List<Tuple<int, int>>();
             // open space between farm and greenhouse
             int xMin = 33; // left side of open space
@@ -102,15 +115,12 @@ namespace StardewValley.MPSaveEditor.Models
         public void ClearLocationForCabin(int x, int y, FarmObject c) {
             var cabin = new FarmObject(GameObjectTypes.Building, x, y, c.Width, c.Height);
             var overlapLists = ObjectsList.Select(t => new KeyValuePair<GameObjectTypes, IEnumerable<Tuple<int,int,FarmObject>>>(t.Key, FindAllOverlaps(t.Value, cabin, true)));
-            foreach(var list in overlapLists) {
-                
+            foreach(var list in overlapLists) {               
                 foreach(var obj in list.Value) { 
                     if (obj.Item3.Element.Parent != null)                   
                         obj.Item3.Element.Remove();
 
-                }
-                //ObjectsList[list.Key].ToList().RemoveAll(t => t.Element == list.Value.Select(u => u.Item3.Element));
-                
+                }   
             }           
         }
 
@@ -122,32 +132,24 @@ namespace StardewValley.MPSaveEditor.Models
                 // And if there aren't any, return the cabin's initial X,Y
                 return new Tuple<int,int, bool>(cabin.TileX, cabin.TileY, false);
             }
-
-            // Then we start checking "optimal" locations for the Cabin
-            // Example: to the left of the farmhouse can hold probably 4-8 cabins easily (at least on a fresh map)
-
-            var optimalLocation = FindByOptimalLocations(cabin);
+            var optimalLocation = FindPossibleLocations(GenerateOptimalLocations(), cabin);
             if (optimalLocation != null) {
                 return optimalLocation;
             }
             // If no optimal location works, start looking everywhere
             
-            // Get a list of all X,Y Coordinates that have FarmObjects
-            // This will help us determine if there are any invalid locations we can make valid 
-            var farmObjects = FindFarmObjects();   
-
+            var location = FindPossibleLocations(GenerateEntireMapLocations(), cabin);
+            if (location != null) {
+                return optimalLocation;
+            }
             // If nowhere works, return nothing, no location is valid, inform the player.
             return null;
         }
 
-        public Tuple<int,int,bool> FindByOptimalLocations(FarmObject cabin) {
+        public Tuple<int,int,bool> FindPossibleLocations(IEnumerable<Tuple<int,int>> locations, FarmObject cabin) {
             Tuple<int,int,bool> optimalCabinLocation = null;
-            var optimalLocationCabins = OptimalLocations.Select(x => new FarmObject(GameObjectTypes.Building, x.Item1, x.Item2, 5, 3));
-                                                                                    // Cabin X , Y, List of Overlaps with X, Y, FarmObject @ overlap
-            var overlapsByCabinLocations = optimalLocationCabins.Select(c => new Tuple<int, int, IEnumerable<Tuple<int, int, FarmObject>>>(c.TileX, c.TileY, ObjectsList.SelectMany(x => FindAllOverlaps(x.Value, c))));
-            // Now that we know the optimalOverlaps, we can check if any of these overlaps FarmObject.CanBeRemoved
-            // If every item can be removed from the optimalOverlaps, we pass back the X,Y,true
-            // If not, keep looking.
+            var entireMapLocationCabins = locations.Select(x => new FarmObject(GameObjectTypes.Building, x.Item1, x.Item2, 5, 3));                                                                                // Cabin X , Y, List of Overlaps with X, Y, FarmObject @ overlap
+            var overlapsByCabinLocations = entireMapLocationCabins.Select(c => new Tuple<int, int, IEnumerable<Tuple<int, int, FarmObject>>>(c.TileX, c.TileY, ObjectsList.SelectMany(x => FindAllOverlaps(x.Value, c))));
             foreach (var possibleCabinLocation in overlapsByCabinLocations) {
                 var possible = true;               
                 foreach (var overlap in possibleCabinLocation.Item3) { 
@@ -164,7 +166,7 @@ namespace StardewValley.MPSaveEditor.Models
                     break;
                 }
             }
-            return optimalCabinLocation;
+            return optimalCabinLocation;            
         }
 
         public IEnumerable<Tuple<int,int,FarmObject>> FindFarmObjects() {

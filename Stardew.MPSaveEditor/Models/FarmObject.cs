@@ -72,8 +72,8 @@ namespace StardewValley.MPSaveEditor.Models {
             Element = cabin.Element;
             TileX = cabin.TileX;
             TileY = cabin.TileY;
-            Width = cabin.Width + 2;
-            Height = cabin.Height + 2;
+            Width = cabin.Width + 1;
+            Height = cabin.Height + 1;
             SetTileXYRange();
         }
 
@@ -121,8 +121,8 @@ namespace StardewValley.MPSaveEditor.Models {
                     TileY = Int32.Parse(Element.Element("tile").Element("Y").Value);
                     break;
                 case GameObjectTypes.Building:                  
-                    Width = Int32.Parse(Element.Element("tilesWide").Value) + 2;
-                    Height = Int32.Parse(Element.Element("tilesHigh").Value) + 2;
+                    Width = Int32.Parse(Element.Element("tilesWide").Value) + 1;
+                    Height = Int32.Parse(Element.Element("tilesHigh").Value) + 1;
                     TileX = Int32.Parse(Element.Element("tileX").Value);
                     TileY = Int32.Parse(Element.Element("tileY").Value);
                     break;
