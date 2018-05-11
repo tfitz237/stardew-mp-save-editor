@@ -10,7 +10,7 @@ namespace StardewValley.MPSaveEditor.Models {
         private XDocument _doc {get;set;}
         private XDocument _originalDoc {get; set;}
         private IEnumerable<XElement> _saveGame {get; set;}
-        private string _path {get;set;}
+        private string _path {get;set;}       
         public SaveGame (string path) {
             try {
                 _path = path;
@@ -25,6 +25,8 @@ namespace StardewValley.MPSaveEditor.Models {
                 throw exception;
             }
         }
+
+        public FarmType Type => (FarmType)Int32.Parse(_saveGame.First(x => x.Name == "whichFarm").Value); 
 
         public string FileName  => Path.GetFileName(_path);
         
@@ -99,6 +101,14 @@ namespace StardewValley.MPSaveEditor.Models {
             var cabin = FindCabinByFarmhand(farmhand);
             Host.ReplaceAll(farmhand.Nodes());
             cabin.Element("indoors").Element("farmhand").ReplaceAll(host.Nodes());           
+        }
+    
+        public enum FarmType {
+            Regular = 0,
+            River = 1,
+            Forest = 2,
+            HillTop = 3,
+            Wilderness = 4
         }
     }   
 }

@@ -8,20 +8,41 @@ namespace StardewValley.MPSaveEditor.Models
     public class GameObjects {
         XNamespace ns = "http://www.w3.org/2001/XMLSchema-instance";
         public IEnumerable<FarmObject> Objects { get; set; }
-        public IEnumerable<FarmObject> Buildings { get; set; } 
-        public IEnumerable<FarmObject> OtherBuildings { get; set; }
+        public IEnumerable<FarmObject> Buildings { get; set; }
+        public List<FarmObject> OtherBuildings { get; set; }
         public IEnumerable<FarmObject> Bushes { get; set; }
         public IEnumerable<XElement> Terrain { get; set; }
         public IEnumerable<FarmObject> Trees { get; set; }
         public IEnumerable<FarmObject> FruitTrees {get; set;}
         public IEnumerable<FarmObject> Grass { get; set; }
         public IEnumerable<FarmObject> HoeDirt { get; set; }
-        public IEnumerable<FarmObject> LogsAndRocks { get; set; }  
-        public Dictionary<GameObjectTypes,IEnumerable<FarmObject>> ObjectsList { get; set;} 
+        public IEnumerable<FarmObject> LogsAndRocks { get; set; }
+        public IEnumerable<IEnumerable<FarmObject>> ObjectsList { get; set;}
+        public SaveGame.FarmType FarmType {get;set;}
 
         public XElement Farm {get;set;}
         public GameObjects(SaveGame game) {
+            FarmType = game.Type;
             Farm = game.Farm;
+            SetObjects();
+            SetOtherBuildings();
+
+
+
+            ObjectsList = new List<IEnumerable<FarmObject>> {
+                Objects,
+                Buildings,
+                Bushes,
+                Trees,
+                FruitTrees,
+                Grass,
+                HoeDirt,
+                LogsAndRocks,
+                OtherBuildings
+            };
+        }   
+
+        public void SetObjects() {
             Objects = Farm.Element("objects").Elements().Select(x => new FarmObject(x, GameObjectTypes.Object));
             Buildings = Farm.Element("buildings").Elements().Select(x => new FarmObject(x, GameObjectTypes.Building));
             Bushes = Farm.Element("largeTerrainFeatures").Elements().Select(x => new FarmObject(x, GameObjectTypes.Bush));
@@ -40,6 +61,10 @@ namespace StardewValley.MPSaveEditor.Models
                 .Attribute(ns + "type")?.Value == "HoeDirt").Select(x => new FarmObject(x, GameObjectTypes.HoeDirt));
             LogsAndRocks = Farm.Element("resourceClumps").Elements().Select(x => new FarmObject(x, GameObjectTypes.LogsAndRocks));
 
+        }
+
+
+        public void SetOtherBuildings() {
             OtherBuildings = new List<FarmObject> {
                 new FarmObject(GameObjectTypes.OtherBuildings, 59, 11, 10, 6), // Farmhouse
                 new FarmObject(GameObjectTypes.OtherBuildings, 7, 8, 3 , 2), // Grandpas
@@ -54,19 +79,20 @@ namespace StardewValley.MPSaveEditor.Models
                 new FarmObject(GameObjectTypes.OtherBuildings, 40, 60, 2, 5) // Farm southern entrance
             };
 
-            ObjectsList = new Dictionary<GameObjectTypes, IEnumerable<FarmObject>> {
-                {GameObjectTypes.Object, Objects},
-                {GameObjectTypes.Building, Buildings},
-                {GameObjectTypes.Bush, Bushes},
-                {GameObjectTypes.Tree, Trees},
-                {GameObjectTypes.FruitTree, FruitTrees},
-                {GameObjectTypes.Grass, Grass},
-                {GameObjectTypes.HoeDirt, HoeDirt},
-                {GameObjectTypes.LogsAndRocks, LogsAndRocks},
-                {GameObjectTypes.OtherBuildings, OtherBuildings}
-            };
-        }   
-
+            if (FarmType == SaveGame.FarmType.Regular) {
+                OtherBuildings.Add(new FarmObject(GameObjectTypes.OtherBuildings, 33, 49, 8, 10));  // Large Pond           
+                OtherBuildings.Add(new FarmObject(GameObjectTypes.OtherBuildings, 70, 28, 6, 6));   // Tiny Pond
+            }
+            if (FarmType == SaveGame.FarmType.Forest) {
+                OtherBuildings.Add(new FarmObject(GameObjectTypes.OtherBuildings, 38, 31, 17, 14)); // Large Pond
+                OtherBuildings.Add(new FarmObject(GameObjectTypes.OtherBuildings, 42, 52, 10, 6)); // South Pond
+                OtherBuildings.Add(new FarmObject(GameObjectTypes.OtherBuildings, 60, 42, 13, 10)); // South East Pond
+                OtherBuildings.Add(new FarmObject(GameObjectTypes.OtherBuildings, 70, 28, 6, 6)); // East Pond           
+            }
+            if (FarmType == SaveGame.FarmType.Wilderness) {
+                OtherBuildings.Add(new FarmObject(GameObjectTypes.OtherBuildings, 39, 24, 19, 16)); // Large Pond 
+            }
+        }
         static public IEnumerable<Tuple<int, int>> GenerateOptimalLocations(){
             List<Tuple<int, int>> optimalLocations = new List<Tuple<int, int>>();
             // open space between farm and greenhouse
@@ -82,19 +108,52 @@ namespace StardewValley.MPSaveEditor.Models
             return optimalLocations;
         }
 
-        static public IEnumerable<Tuple<int, int>> GenerateEntireMapLocations(){
-            List<Tuple<int, int>> optimalLocations = new List<Tuple<int, int>>();
-            // open space between farm and greenhouse
-            int xMin = 33; // left side of open space
-            int yMin = 10; // top of open space
-            int xMax = 57; // right side of open space
-            int yMax = 17; // bottom of open space
-            for (int i = xMin; i <= xMax; i++){
-                for (int j = yMin; j <= yMax; j++){
-                    optimalLocations.Add(new Tuple<int, int>(i, j));
+
+        public IEnumerable<Tuple<int, int>> GenerateEntireMapLocations(){
+           List<Tuple<int, int>> allLocations = new List<Tuple<int, int>>();
+            List<int> xMin = new List<int>();
+            List<int> yMin = new List<int>();
+            List<int> yMax = new List<int>();
+            List<int> xMax = new List<int>();
+
+
+            var exclusions = new List<Func<int,int,bool>> ();
+            if (FarmType == SaveGame.FarmType.Regular) {
+                // main area
+                xMin.Add(7);
+                yMin.Add(16); 
+                xMax.Add(67); 
+                yMax.Add(54);
+            }
+            else if (FarmType == SaveGame.FarmType.Forest) {
+                // main area
+                xMin.Add(23);
+                yMin.Add(18); 
+                xMax.Add(71); 
+                yMax.Add(53);
+            }
+            else if (FarmType == SaveGame.FarmType.Wilderness) {
+                // main area
+                xMin.Add(29);
+                yMin.Add(18); 
+                xMax.Add(66); 
+                yMax.Add(53);               
+            }
+            // Tough to find viable spots
+            else if (FarmType == SaveGame.FarmType.River) {
+                
+            }
+            // Tough to find viable spots
+            else if (FarmType == SaveGame.FarmType.HillTop) {
+
+            }         
+            for(int c = 0; c < xMin.Count(); c++)
+            for (int i = xMin[c]; i <= xMax[c]; i++){
+                for (int j = yMin[c]; j <= yMax[c]; j++){
+                    allLocations.Add(new Tuple<int, int>(i, j));                   
                 }
             }
-            return optimalLocations;
+            return allLocations;
         }
 
         public bool MoveToValidLocation(Cabin originalCabin) {
@@ -114,20 +173,17 @@ namespace StardewValley.MPSaveEditor.Models
 
         public void ClearLocationForCabin(int x, int y, FarmObject c) {
             var cabin = new FarmObject(GameObjectTypes.Building, x, y, c.Width, c.Height);
-            var overlapLists = ObjectsList.Select(t => new KeyValuePair<GameObjectTypes, IEnumerable<Tuple<int,int,FarmObject>>>(t.Key, FindAllOverlaps(t.Value, cabin, true)));
-            foreach(var list in overlapLists) {               
-                foreach(var obj in list.Value) { 
-                    if (obj.Item3.Element.Parent != null)                   
-                        obj.Item3.Element.Remove();
-
-                }   
+            var overlapLists = ObjectsList.SelectMany(t => FindAllOverlaps(t, cabin, true));
+            foreach(var obj in overlapLists) {               
+                if (obj.Item3.Element.Parent != null)                   
+                    obj.Item3.Element.Remove();             
             }           
         }
 
         // Returns X, Y, NeedsRemoval
         public Tuple<int,int,bool> FindValidLocation(FarmObject cabin) {
             // First, check if the inital location has any overlaps
-            var initialOverlaps = ObjectsList.Select(x => FindAllOverlaps(x.Value, cabin));
+            var initialOverlaps = ObjectsList.Select(x => FindAllOverlaps(x, cabin));
             if (!initialOverlaps.Any()) {
                 // And if there aren't any, return the cabin's initial X,Y
                 return new Tuple<int,int, bool>(cabin.TileX, cabin.TileY, false);
@@ -148,8 +204,8 @@ namespace StardewValley.MPSaveEditor.Models
 
         public Tuple<int,int,bool> FindPossibleLocations(IEnumerable<Tuple<int,int>> locations, FarmObject cabin) {
             Tuple<int,int,bool> optimalCabinLocation = null;
-            var entireMapLocationCabins = locations.Select(x => new FarmObject(GameObjectTypes.Building, x.Item1, x.Item2, 5, 3));                                                                                // Cabin X , Y, List of Overlaps with X, Y, FarmObject @ overlap
-            var overlapsByCabinLocations = entireMapLocationCabins.Select(c => new Tuple<int, int, IEnumerable<Tuple<int, int, FarmObject>>>(c.TileX, c.TileY, ObjectsList.SelectMany(x => FindAllOverlaps(x.Value, c))));
+            var listOfPotentialCabins = locations.Select(x => new FarmObject(GameObjectTypes.Building, x.Item1, x.Item2, 5, 3));                                                                                // Cabin X , Y, List of Overlaps with X, Y, FarmObject @ overlap
+            var overlapsByCabinLocations = listOfPotentialCabins.Select(c => new Tuple<int, int, IEnumerable<Tuple<int, int, FarmObject>>>(c.TileX, c.TileY, ObjectsList.SelectMany(x => FindAllOverlaps(x, c))));
             foreach (var possibleCabinLocation in overlapsByCabinLocations) {
                 var possible = true;               
                 foreach (var overlap in possibleCabinLocation.Item3) { 
@@ -172,7 +228,7 @@ namespace StardewValley.MPSaveEditor.Models
         public IEnumerable<Tuple<int,int,FarmObject>> FindFarmObjects() {
             var list = new List<Tuple<int,int,FarmObject>>();
             foreach(var lst in ObjectsList) {
-                foreach (var obj in lst.Value) {
+                foreach (var obj in lst) {
                     foreach (var range in obj.TileXYRange) {
                         list.Add(new Tuple<int,int,FarmObject>(range.Item1, range.Item1, obj));
                     }
@@ -214,8 +270,6 @@ namespace StardewValley.MPSaveEditor.Models
             return object1.TileXYRange.Where(x => object2.TileXYRange.Contains(x));
         }
     }
-
-
 
     public enum GameObjectTypes {
         Tree,
