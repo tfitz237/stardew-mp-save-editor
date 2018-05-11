@@ -90,4 +90,19 @@ namespace Tests
             Assert.Equal(expected, result);
         }
     }
+
+    public class FarmObjectTests
+    {
+        [Fact]
+        public void TestCanBeRemoved()
+        {
+            var sut = new GameObjects(new SaveGame("../../../samples/BB_185160008"));
+
+            var dirt = sut.HoeDirt;
+
+            var test = dirt.First();
+
+            var x = test.CanBeRemoved;
+        }
+    }
 }
