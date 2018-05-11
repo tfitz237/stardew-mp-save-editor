@@ -196,7 +196,7 @@ namespace StardewValley.MPSaveEditor.Models
             
             var location = FindPossibleLocations(GenerateEntireMapLocations(), cabin);
             if (location != null) {
-                return optimalLocation;
+                return location;
             }
             // If nowhere works, return nothing, no location is valid, inform the player.
             return null;
