@@ -75,6 +75,9 @@ namespace StardewValley.MPSaveEditor.Models {
         public void MoveToValidLocation(Cabin cabin) {
             var objects = new GameObjects(this);
             var valid = objects.MoveToValidLocation(cabin);
+            if (!valid) {
+                Console.WriteLine("There were no valid locations found for the new cabin on your farm.");
+            } 
         }
 
         public XElement FindCabinByFarmhand(XElement farmhand) {

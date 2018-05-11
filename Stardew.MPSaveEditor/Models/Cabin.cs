@@ -17,8 +17,22 @@ namespace StardewValley.MPSaveEditor.Models {
             }
         }
 
-        public int TileX => Int32.Parse(Element.Element("tileX").Value);
-        public int TileY => Int32.Parse(Element.Element("tileY").Value);
+        public int TileX { 
+            get {
+                return Int32.Parse(Element.Element("tileX").Value);
+            }
+            set {
+                Element.Element("tileX").Value = value.ToString();
+            }
+        }
+        public int TileY { 
+            get {
+                return Int32.Parse(Element.Element("tileY").Value);
+            }
+            set {
+                Element.Element("tileY").Value = value.ToString();
+            }
+        }
         public int Height => Int32.Parse(Element.Element("tilesHigh").Value);
         public int Width => Int32.Parse(Element.Element("tilesWide").Value);
         public void CreateNewCabin() {
