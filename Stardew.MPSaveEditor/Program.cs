@@ -15,7 +15,8 @@ namespace StardewValley.MPSaveEditor
 
             Dictionary<int, string> Commands = new Dictionary<int, string> {
                 { 1 , "AddPlayers" },
-                { 2, "ChangeHost" }
+                { 2, "ChangeHost" },
+                { 3, "RemoveCabin"}
             };
 
             var app = new CommandLineApplication();
@@ -40,6 +41,9 @@ namespace StardewValley.MPSaveEditor
                         break;
                     case 2:
                         CommandLineApplication.Execute<ChangeHostCommand>();
+                        break;
+                    case 3:
+                        CommandLineApplication.Execute<RemoveCabinCommand>();
                         break;
                 }
 

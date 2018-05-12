@@ -10,7 +10,9 @@ namespace StardewValley.MPSaveEditor.Models {
         private XDocument _doc {get;set;}
         private XDocument _originalDoc {get; set;}
         private IEnumerable<XElement> _saveGame {get; set;}
-        private string _path {get;set;}       
+        private string _path {get;set;}  
+
+        private DateTime _timestamp {get; set;}     
         public SaveGame (string path) {
             try {
                 _path = path;
@@ -24,6 +26,8 @@ namespace StardewValley.MPSaveEditor.Models {
             } catch(Exception exception) {
                 throw exception;
             }
+            _timestamp = DateTime.Now;
+
         }
 
         public FarmType Type => (FarmType)Int32.Parse(_saveGame.First(x => x.Name == "whichFarm").Value); 
@@ -70,7 +74,7 @@ namespace StardewValley.MPSaveEditor.Models {
             
         public void SaveFile() {
             System.IO.Directory.CreateDirectory("saves");
-            var dir = $"{FileName}_{DateTime.Now.ToString("MMddyyHHmm")}";
+            var dir = $"{FileName}_{_timestamp.ToString("MMddyyHHmm")}";
             System.IO.Directory.CreateDirectory($"saves\\{dir}");
             _originalDoc.Save($"./saves/{dir}/{FileName}_ORIGINAL");
             _doc.Save($"./saves/{dir}/{FileName}");
@@ -113,6 +117,21 @@ namespace StardewValley.MPSaveEditor.Models {
             var cabin = FindCabinByFarmhand(farmhand);
             Host.ReplaceAll(farmhand.Nodes());
             cabin.Element("indoors").Element("farmhand").ReplaceAll(host.Nodes());           
+        }
+
+        public void RemoveCabin(XElement cabin) {
+            var farmhand = cabin.Element("indoors").Element("farmhand");
+            if (farmhand.Element("name").IsEmpty) {
+                cabin.Remove();
+            } else {
+                var xdoc = new XDocument(farmhand);
+                Console.WriteLine("Saving backup of farmhand...");
+                System.IO.Directory.CreateDirectory("saves");
+                var dir = $"{FileName}_{_timestamp.ToString("MMddyyHHmm")}";
+                System.IO.Directory.CreateDirectory($"saves\\{dir}");
+                xdoc.Save($"./saves/{dir}/{FileName}_Farmhand_{farmhand.Element("name").Value}");
+            }
+            
         }
     
         public enum FarmType {
