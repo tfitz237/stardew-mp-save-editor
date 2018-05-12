@@ -102,6 +102,10 @@ namespace StardewValley.MPSaveEditor.Models {
             farmhand = new XElement(farmhand);
             farmhand.Element("eventsSeen").ReplaceAll(host.Element("eventsSeen").Nodes());
             farmhand.Element("caveChoice").Value = host.Element("caveChoice").Value;
+            farmhand.Element("songsHeard").ReplaceAll(host.Element("songsHeard").Nodes());
+            farmhand.Element("mailReceived").ReplaceAll(host.Element("mailReceived").Nodes());
+            farmhand.Element("stats").Element("daysPlayed").Value = host.Element("stats").Element("daysPlayed").Value;
+            farmhand.Element("stats").Element("DaysPlayed").Value = host.Element("stats").Element("DaysPlayed").Value;
             var farmhandUpgradeLevel = new XElement(farmhand.Element("houseUpgradeLevel"));
             var farmhandRecentBed = new XElement(farmhand.Element("mostRecentBed"));
             var farmhandRecentPosition = new XElement(farmhand.Element("Position"));
