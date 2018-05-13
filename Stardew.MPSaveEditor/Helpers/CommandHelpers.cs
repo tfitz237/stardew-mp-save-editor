@@ -31,6 +31,24 @@ namespace StardewValley.MPSaveEditor.Helpers
 
             return saveFiles[userSelection];
         }
+
+        public static List<SaveFile> FindSaveFiles() {
+            var path = String.Format("C:/Users/{0}/AppData/Roaming/StardewValley/Saves", Environment.UserName);
+            var saveFiles = new List<SaveFile>();
+            foreach(String saveFolder in Directory.GetDirectories(path)) {
+                String saveFileName = Regex.Matches(saveFolder, @"[^\\]*$").First().ToString();
+                String saveFilePath = String.Format("{0}/{1}", saveFolder, saveFileName).Replace("\\", "/");
+                saveFiles.Add(new SaveFile {SaveFileName = saveFileName, SaveFilePath = saveFilePath});
+            }
+
+            return saveFiles;
+
+        }
+
+        public struct SaveFile {
+            public string SaveFileName {get;set;}
+            public string SaveFilePath {get;set;}
+        } 
     }
 
 }

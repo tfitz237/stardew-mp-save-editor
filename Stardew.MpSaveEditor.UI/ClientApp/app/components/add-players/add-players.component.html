@@ -1,0 +1,17 @@
+<h1>Add Players</h1>
+
+<h3>Select a save file</h3>
+    <p>
+        <select [(ngModel)]="saveFileSelection">
+            <ng-container >
+                <option *ngFor="let saveFile of saveFiles" value="{{ saveFile.saveFilePath}}">{{ saveFile.saveFileName }}</option>
+            </ng-container>
+        </select>
+        <br /> <br />
+        <input [(ngModel)]="numberOfPlayers" type="number" /> Number of Cabins and Player slots to add
+    </p>
+    <button (click)="addPlayerSlots()" [disabled]="!(saveFileSelection && numberOfPlayers > 0)">Select Save File</button>
+
+    <p *ngIf="message">
+        {{message}}
+    </p>

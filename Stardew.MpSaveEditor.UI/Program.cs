@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,10 +7,8 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using ElectronNET.API;
-using ElectronNET.API.Entities;
 
-namespace Stardew.MpSaveEditor.UI
+namespace Stardew.MPSaveEditor.UI
 {
     public class Program
     {
@@ -21,7 +19,6 @@ namespace Stardew.MpSaveEditor.UI
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseElectron(args)
                 .UseStartup<Startup>()
                 .Build();
     }
