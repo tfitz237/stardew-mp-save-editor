@@ -49,6 +49,7 @@ module.exports = (env) => {
     };
 
     const clientBundleConfig = merge(sharedConfig, {
+        
         entry: {
             // To keep development builds fast, include all vendor dependencies in the vendor bundle.
             // But for production builds, leave the tree-shakable ones out so the AOT compiler can produce a smaller bundle.
