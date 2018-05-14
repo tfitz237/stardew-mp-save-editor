@@ -42,7 +42,12 @@ namespace StardewValley.MPSaveEditor.Models {
             .Elements()
             .Single(x =>
                 x.Attribute(ns + "type")?.Value == "Farm"); 
-                
+        public XElement FarmHouse => _saveGame
+            .First(x => x.Name == "locations")
+            .Elements()
+            .Single(x =>
+                x.Attribute(ns + "type")?.Value == "FarmHouse"); 
+                               
         public IEnumerable<XElement> Buildings => Farm
             .Element("buildings")
             .Elements();
@@ -100,6 +105,7 @@ namespace StardewValley.MPSaveEditor.Models {
         public void SwitchHost(XElement farmhand) {
             var host = new XElement(Host);
             farmhand = new XElement(farmhand);
+            var cabin = FindCabinByFarmhand(farmhand);
             farmhand.Element("eventsSeen").ReplaceAll(host.Element("eventsSeen").Nodes());
             farmhand.Element("caveChoice").Value = host.Element("caveChoice").Value;
             farmhand.Element("songsHeard").ReplaceAll(host.Element("songsHeard").Nodes());
@@ -110,17 +116,20 @@ namespace StardewValley.MPSaveEditor.Models {
             var farmhandRecentBed = new XElement(farmhand.Element("mostRecentBed"));
             var farmhandRecentPosition = new XElement(farmhand.Element("Position"));
             var farmhandHome = new XElement(farmhand.Element("homeLocation"));
+            var cabinNPCs = new XElement(cabin.Element("indoors").Element("characters"));
             farmhand.Element("houseUpgradeLevel").Value = host.Element("houseUpgradeLevel").Value;
             farmhand.Element("mostRecentBed").ReplaceAll(host.Element("mostRecentBed").Nodes());
             farmhand.Element("Position").ReplaceAll(host.Element("Position").Nodes());
             farmhand.Element("homeLocation").Value = host.Element("homeLocation").Value;
+            FarmHouse.Element("characters").ReplaceAll(cabinNPCs.Nodes());
             host.Element("mostRecentBed").ReplaceAll(farmhandRecentPosition.Nodes());
             host.Element("Position").ReplaceAll(farmhandRecentBed.Nodes());
             host.Element("houseUpgradeLevel").Value = farmhandUpgradeLevel.Value;
             host.Element("homeLocation").Value = farmhandHome.Value;
-            var cabin = FindCabinByFarmhand(farmhand);
             Host.ReplaceAll(farmhand.Nodes());
-            cabin.Element("indoors").Element("farmhand").ReplaceAll(host.Nodes());           
+            cabin.Element("indoors").Element("farmhand").ReplaceAll(host.Nodes());    
+            cabin.Element("indoors").Element("characters").ReplaceAll(FarmHouse.Element("characters").Nodes());
+                   
         }
 
         public void RemoveCabin(XElement cabin) {
