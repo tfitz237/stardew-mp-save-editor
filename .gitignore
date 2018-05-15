@@ -2,6 +2,6 @@
 bin/
 obj/
 Stardew.MPSaveEditor/saves/*
-Stardew.MPSaveEditor/out/
+Stardew.MPSaveEditor/releases/Stardew.MPSaveEditor/*
 Stardew.MPSaveEditor/Stardew.MpSaveEditor.zip
 Stardew.MPSaveEditor/Stardew.MPSaveEditor/
