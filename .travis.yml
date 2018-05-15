@@ -4,7 +4,7 @@ mono: none
 dotnet: 2.1.200
 script:
  - dotnet -c Release -r win10-x64 -o releases/Stardew.MPSaveEditor
- - zip releases/Stardew.MPSaveEditor-${TRAVIS_TAG}-${TRAVIS_BUILD_NUMBER}.zip
+ - zip releases/Stardew.MPSaveEditor releases/Stardew.MPSaveEditor-${TRAVIS_BUILD_NUMBER}.zip
 branches:
    only: 
      - master
