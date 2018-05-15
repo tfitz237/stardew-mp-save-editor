@@ -1,0 +1,10 @@
+before_script: cd Stardew.MPSaveEditor
+language: csharp
+mono: none
+dotnet: 2.1.200
+branches:
+  only:
+  - master
+  - releases/.*
+script:
+ - dotnet build
