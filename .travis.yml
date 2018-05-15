@@ -1,3 +1,4 @@
+before_script: cd Stardew.MPSaveEditor
 mono: none
 dotnet: 2.1.200
 script:
