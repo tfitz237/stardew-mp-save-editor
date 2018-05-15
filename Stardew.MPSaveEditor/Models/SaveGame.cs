@@ -27,7 +27,7 @@ namespace StardewValley.MPSaveEditor.Models {
                 _doc = XDocument.Load(_path);
                 _originalDoc =XDocument.Load(_path);
                 _fileName = Path.GetFileName(_path);
-                _saveGameInfoDoc = XDocument.Load(_path.Replace(_fileName, "SaveGameInfo")));
+                _saveGameInfoDoc = XDocument.Load(_path.Replace($"{_fileName}/{_fileName}", $"{_fileName}/SaveGameInfo"));
                 FileName = _fileName;
                 _saveGame = _doc?.Element("SaveGame")?.Elements();         
                 if (_saveGame == null || !_saveGame.Any()) {
@@ -97,7 +97,7 @@ namespace StardewValley.MPSaveEditor.Models {
             _doc.Save($"./saves/{dir}/{_fileName}");
             if (overwriteSaveFile) {
                 _doc.Save(_path);
-                _saveGameInfoDoc.Save(_path.Replace(_fileName, "SaveGameInfo"));
+                _saveGameInfoDoc.Save(_path.Replace($"{_fileName}/{_fileName}", $"{_fileName}/SaveGameInfo"));
             }
         }
 
@@ -127,7 +127,7 @@ namespace StardewValley.MPSaveEditor.Models {
 
         public void UpdateHost() {
             Host.Element("slotCanHost").Value = "true";
-            SaveGameInfoDoc.Element("Famer").Elemetn("slotCanHost").Value = "true";
+            _saveGameInfoDoc.Element("Farmer").Element("slotCanHost").Value = "true";
         }
         public XElement SwitchHost(XElement farmhand) {
             var host = new XElement(Host);
