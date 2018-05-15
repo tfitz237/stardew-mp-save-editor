@@ -9,6 +9,7 @@ namespace StardewValley.MPSaveEditor.Models {
         XNamespace ns = "http://www.w3.org/2001/XMLSchema-instance";
         private XDocument _doc {get;set;}
         private XDocument _originalDoc {get; set;}
+        private XDocument _saveGameInfoDoc {get; set;}
         private IEnumerable<XElement> _saveGame {get; set;}
         private string _path {get;set;}  
 
@@ -26,6 +27,7 @@ namespace StardewValley.MPSaveEditor.Models {
                 _doc = XDocument.Load(_path);
                 _originalDoc =XDocument.Load(_path);
                 _fileName = Path.GetFileName(_path);
+                _saveGameInfoDoc = XDocument.Load(_path.Replace(_fileName, "SaveGameInfo")));
                 FileName = _fileName;
                 _saveGame = _doc?.Element("SaveGame")?.Elements();         
                 if (_saveGame == null || !_saveGame.Any()) {
@@ -78,6 +80,7 @@ namespace StardewValley.MPSaveEditor.Models {
             var cabin = new Cabin();
             cabin.CreateCabin(farmhand);
             cabin.UpdateFarmhand(Host);
+            UpdateHost();
             var moved = MoveToValidLocation(cabin);
             if (moved) {
                 Farm.Element("buildings").Add(cabin.Element);
@@ -94,6 +97,7 @@ namespace StardewValley.MPSaveEditor.Models {
             _doc.Save($"./saves/{dir}/{_fileName}");
             if (overwriteSaveFile) {
                 _doc.Save(_path);
+                _saveGameInfoDoc.Save(_path.Replace(_fileName, "SaveGameInfo"));
             }
         }
 
@@ -121,7 +125,10 @@ namespace StardewValley.MPSaveEditor.Models {
             return Farmhands.FirstOrDefault(x => x.Element("name").Value == name);
         }
 
-
+        public void UpdateHost() {
+            Host.Element("slotCanHost").Value = "true";
+            SaveGameInfoDoc.Element("Famer").Elemetn("slotCanHost").Value = "true";
+        }
         public XElement SwitchHost(XElement farmhand) {
             var host = new XElement(Host);
             farmhand = new XElement(farmhand);

@@ -75,6 +75,7 @@ namespace StardewValley.MPSaveEditor.Models {
         public void UpdateFarmhand(XElement host) {
             Farmhand.Element("farmName").Value = host.Element("farmName").Value;
             Farmhand.Element("money").Value = host.Element("money").Value;
+            Farmhand.Element("slotCanHost").Value = "true";
         }
 
         public void SwitchFarmhand(XElement farmhand) {

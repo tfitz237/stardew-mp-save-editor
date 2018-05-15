@@ -52,19 +52,25 @@ namespace StardewValley.MPSaveEditor.Models {
         }
 
         public bool AddFarmhand(Farmhand farmhand = null) {
-            if (farmhand == null || farmhand.InStorage) {
+            if (farmhand == null) {
+                var cabin = _game.CreateNewCabin(farmhand);
+                if (cabin == null) {
+                    return false;
+                }  
+                return true;
+            } else {
                 var cabin = _game.FindEmptyCabin();
+                                
                 if (cabin == null) {
                     cabin = _game.CreateNewCabin(farmhand);
-                } 
-                else if (farmhand != null) {
-                    cabin.SwitchFarmhand(new XElement(farmhand.Element));
-                    farmhand.Cabin = cabin;
-                    farmhand.Element.Remove();
-                }               
+                    if (cabin == null)
+                        return false;
+                }  
+                cabin.SwitchFarmhand(new XElement(farmhand.Element));
+                farmhand.Cabin = cabin;
+                farmhand.Element.Remove();                             
                 return true;
             }
-            return false;
         }
 
         public void StoreFarmhand(Farmhand farmhand) {

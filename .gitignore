@@ -4,5 +4,5 @@ obj/
 Stardew.MPSaveEditor/saves/
 Stardew.MpSaveEditor/farmhands/
 Stardew.MPSaveEditor/out/
-Stardew.MPSaveEditor/*.zip
+Stardew.MPSaveEditor/**/*.zip
 Stardew.MPSaveEditor/releases/Stardew.MPSaveEditor/

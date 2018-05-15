@@ -50,6 +50,7 @@ namespace StardewValley.MPSaveEditor.Helpers
             Console.WriteLine("Would you like to overwrite the save file in the Stardew Valley/Saves folder?");
             Console.WriteLine("-------------------------------------------------------------------------------");
             Console.WriteLine("-- There will always be an ORIGINAL file saved in Stardew.MPSaveEditor/saves directory (by timestamp).");
+            Console.WriteLine("-- If this is a SP game converted to MP, this overwrite will ensure your SP game will be hostable")
             Console.WriteLine("-- Type 'yes' without the quotes to overwrite.");
             Console.WriteLine("-- Type anything else (or nothing) to not overwrite the save file.");
             

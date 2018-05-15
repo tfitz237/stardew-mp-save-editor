@@ -62,12 +62,16 @@ namespace StardewValley.MPSaveEditor.Commands
         public bool AddFarmhand() {
             Console.WriteLine("---------");
             Console.WriteLine("Choose a farmhand: ");
-            Console.WriteLine("1. <New Farmhand>");
+            Console.WriteLine("1. <New Farmhand> (with cabin and player slot)");
             bool success = true;
             var farmhands = SelectFarmhands(false, 1);
             var farmhandNumber = Prompt.GetInt(Purpose[PurposeEnum.AddToGame], 1);
             if (farmhandNumber == 1) {
+                Console.WriteLine("Adding new cabin and player slot...");
                 success = _farmhands.AddFarmhand();
+                if (!success) {
+                    Console.WriteLine("We had trouble finding a valid spot for the new cabin.");
+                }
                 _farmhands.SaveFile();
                 CommandHelpers.SaveFile(_game);                                
             }
