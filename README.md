@@ -1,6 +1,8 @@
 # Stardew Valley Even More Multiplayer
 For those of you that need more than four players in a single game of Stardew Valley.
 
+[![Build Status](https://travis-ci.com/tfitz237/stardew-mp-save-editor.svg?branch=master)](https://travis-ci.com/tfitz237/stardew-mp-save-editor)
+
 ## Getting Started
 Run this application from a terminal, all necessary runtimes and dependencies will be included in the release.
 
