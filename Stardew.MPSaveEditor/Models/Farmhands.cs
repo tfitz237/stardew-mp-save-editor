@@ -21,6 +21,7 @@ namespace StardewValley.MPSaveEditor.Models {
 
 
 
+
         public void FindFarmhands(SaveGame game) {
             var fileName = "";
             var hasFarmhands = false;

@@ -58,23 +58,35 @@ namespace StardewValley.MPSaveEditor.Commands
             Console.WriteLine("---------");
             Console.WriteLine("Choose a farmhand: ");
             Console.WriteLine("1. <New Farmhand>");
-            var farmhandCount = 1;
             bool success = true;
-            foreach (var stored in _farmhands.FarmhandsInStorage) {
-                farmhandCount++;
-                Console.WriteLine(string.Format("{0}. {1}", farmhandCount, stored.Name));
-            }           
+            var farmhands = FindFarmhands(false, 1);
             var farmhandNumber = Prompt.GetInt(Purpose[PurposeEnum.AddToGame], 1);
             if (farmhandNumber == 1) {
                 success = _farmhands.AddFarmhand();
                 _game.SaveFile();                                
             }
             if (farmhandNumber > 1) {
-                var farmhand = _farmhands.FarmhandsInStorage.ElementAt(farmhandNumber - 2);
+                var farmhand = farmhands.ElementAt(farmhandNumber - 2);
                 success = _farmhands.AddFarmhand(farmhand);
             }
             return success;
         }
+
+        public IEnumerable<Farmhand> FindFarmhands(bool inGame, int startingIndex) {
+            var farmhandCount = startingIndex;
+            IEnumerable<Farmhand> farmhands; 
+            if (inGame) {
+                farmhands =  _farmhands.FarmhandsInGame;
+            } else {
+                farmhands = _farmhands.FarmhandsInStorage;
+            }
+            foreach (var fh in farmhands) {
+                farmhandCount++;
+                Console.WriteLine(string.Format("{0}. {1}", farmhandCount, fh.Name));        
+            }
+            return farmhands;
+        }
+
 
         public bool RemoveFarmhand() {
             Console.WriteLine("---------");
@@ -82,13 +94,9 @@ namespace StardewValley.MPSaveEditor.Commands
             Console.WriteLine("1. Yes");
             Console.WriteLine("2. No");
             var storeFarmhand = Prompt.GetInt("Store removed farmhand in storage? ", 1) == 1;
-            var farmhandCount = 0;
-            foreach (var stored in _farmhands.FarmhandsInGame) {
-                farmhandCount++;
-                Console.WriteLine(string.Format("{0}. {1}", farmhandCount, stored.Name));
-            }           
+            var farmhands = FindFarmhands(true, 0);     
             var farmhandNumber = Prompt.GetInt(Purpose[storeFarmhand ? PurposeEnum.RemoveAndStore : PurposeEnum.RemoveNoStore], 1);
-            var farmhand = _farmhands.FarmhandsInGame.ElementAt(farmhandNumber - 1);
+            var farmhand = farmhands.ElementAt(farmhandNumber - 1);
             _farmhands.RemoveFarmhandFromCabin(farmhand, storeFarmhand);
             _farmhands.SaveFile();
             return true;
