@@ -12,27 +12,33 @@ namespace StardewValley.MPSaveEditor.Models {
         private IEnumerable<XElement> _saveGame {get; set;}
         private string _path {get;set;}  
 
+        private string _fileName  {get; set;}
+
         private DateTime _timestamp {get; set;}     
         public SaveGame (string path) {
-            try {
-                _path = path;
-                _doc = XDocument.Load(path);
-                _originalDoc =XDocument.Load(path);
+            LoadFile(path);
+            _timestamp = DateTime.Now;
 
-                _saveGame = _doc?.Element("SaveGame")?.Elements();                 
+        }
+        public void LoadFile(string path) {
+            try {    
+                _path = path;
+                _doc = XDocument.Load(_path);
+                _originalDoc =XDocument.Load(_path);
+                _fileName = Path.GetFileName(_path);
+                FileName = _fileName;
+                _saveGame = _doc?.Element("SaveGame")?.Elements();         
                 if (_saveGame == null || !_saveGame.Any()) {
                     throw new Exception("Game file not parsed correctly");
                 }
             } catch(Exception exception) {
                 throw exception;
-            }
-            _timestamp = DateTime.Now;
-
+            } 
         }
 
         public FarmType Type => (FarmType)Int32.Parse(_saveGame.First(x => x.Name == "whichFarm").Value); 
-
-        public string FileName  => Path.GetFileName(_path);
+        public string UniqueId => _saveGame.FirstOrDefault(x => x.Name == "uniqueIDForThisGame")?.Value;
+        public string FileName { get; private set;}
         
         public XElement Host => _saveGame
             .First(x => x.Name == "player");
@@ -62,27 +68,30 @@ namespace StardewValley.MPSaveEditor.Models {
                 x.Element("indoors")
                  .Element("farmhand"));
         
+        public int PlayerSlots => Cabins.Count();
         public IEnumerable<string> FarmhandNames => Farmhands
         .Where(x => !x.Element("name").IsEmpty)
             .Select(x => 
                 x.Element("name").Value);
         
-        public void CreateNewCabin() {
+        public Cabin CreateNewCabin(Farmhand farmhand = null) {
             var cabin = new Cabin();
-            cabin.CreateNewCabin();
+            cabin.CreateCabin(farmhand);
             cabin.UpdateFarmhand(Host);
             var moved = MoveToValidLocation(cabin);
             if (moved) {
                 Farm.Element("buildings").Add(cabin.Element);
+                return cabin;
             }
+            return null;
         }
             
         public void SaveFile() {
             System.IO.Directory.CreateDirectory("saves");
-            var dir = $"{FileName}_{_timestamp.ToString("MMddyyHHmm")}";
+            var dir = $"{_fileName}_{_timestamp.ToString("MMddyyHHmm")}";
             System.IO.Directory.CreateDirectory($"saves\\{dir}");
-            _originalDoc.Save($"./saves/{dir}/{FileName}_ORIGINAL");
-            _doc.Save($"./saves/{dir}/{FileName}");
+            _originalDoc.Save($"./saves/{dir}/{_fileName}_ORIGINAL");
+            _doc.Save($"./saves/{dir}/{_fileName}");
         }
 
         public bool MoveToValidLocation(Cabin cabin) {
@@ -98,9 +107,17 @@ namespace StardewValley.MPSaveEditor.Models {
             return Cabins.FirstOrDefault(x => x.Element("indoors").Element("farmhand").Element("name").Value == farmhand.Element("name").Value);
         }
 
+        public Cabin FindEmptyCabin() {
+            var cabin = Cabins.FirstOrDefault(x => x.Element("indoors").Element("farmhand").Element("name").IsEmpty);
+            if (cabin == null) 
+                return null;
+            return new Cabin(cabin);
+        }
+
         public XElement GetFarmhandByName(string name) {
             return Farmhands.FirstOrDefault(x => x.Element("name").Value == name);
         }
+
 
         public void SwitchHost(XElement farmhand) {
             var host = new XElement(Host);
@@ -140,9 +157,9 @@ namespace StardewValley.MPSaveEditor.Models {
                 var xdoc = new XDocument(farmhand);
                 Console.WriteLine("Saving backup of farmhand...");
                 System.IO.Directory.CreateDirectory("saves");
-                var dir = $"{FileName}_{_timestamp.ToString("MMddyyHHmm")}";
+                var dir = $"{_fileName}_{_timestamp.ToString("MMddyyHHmm")}";
                 System.IO.Directory.CreateDirectory($"saves\\{dir}");
-                xdoc.Save($"./saves/{dir}/{FileName}_Farmhand_{farmhand.Element("name").Value}");
+                xdoc.Save($"./saves/{dir}/{_fileName}_Farmhand_{farmhand.Element("name").Value}");
             }
             
         }

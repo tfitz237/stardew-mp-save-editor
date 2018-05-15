@@ -11,7 +11,7 @@ namespace StardewValley.MPSaveEditor.Models {
         public XElement Element { get; set; }
         public Cabin(XElement cabin = null) {
             if (cabin == null) {
-                CreateNewCabin();
+                CreateCabin();
             } else {
                 Element = cabin;
             }
@@ -35,15 +35,22 @@ namespace StardewValley.MPSaveEditor.Models {
         }
         public int Height => Int32.Parse(Element.Element("tilesHigh").Value);
         public int Width => Int32.Parse(Element.Element("tilesWide").Value);
-        public void CreateNewCabin() {
+
+
+        public void CreateCabin(Farmhand farmhand = null) {
             XDocument template = XDocument.Load(templatePath);
             var blankCabin = template.Element("template")
                 .Element("Building");
             Element = new XElement(blankCabin);
             ReplaceCabinName();
-            ReplaceMultiplayerId();
+            if (farmhand != null) {
+                Farmhand.ReplaceAll(farmhand.Element.Nodes());
+            } else {
+                  ReplaceMultiplayerId();
+            }
             ReplaceCabinType();
         }
+
         public void ReplaceCabinName() {
             var uniqueName = $"Cabin{Guid.NewGuid()}";
             Element.Element("indoors").Element("uniqueName").Value = uniqueName;
@@ -68,6 +75,10 @@ namespace StardewValley.MPSaveEditor.Models {
         public void UpdateFarmhand(XElement host) {
             Farmhand.Element("farmName").Value = host.Element("farmName").Value;
             Farmhand.Element("money").Value = host.Element("money").Value;
+        }
+
+        public void SwitchFarmhand(XElement farmhand) {
+            Farmhand.ReplaceAll(farmhand.Nodes());
         }
 
         public XElement Farmhand => Element.Element("indoors").Element("farmhand");
