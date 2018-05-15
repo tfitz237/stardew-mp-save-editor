@@ -53,9 +53,9 @@ namespace StardewValley.MPSaveEditor.Commands
         public bool ShowCurrentFarmhands() {
                 Console.WriteLine("Current farmhands in game: ");
                 Console.WriteLine(" >> Host: " + _game.Host.Element("name")?.Value ?? "None?!");
-                SelectFarmhands(true, 0);
+                SelectFarmhands(0, inGame:true, hideBlank:false);
                 Console.WriteLine("Current farmhands in storage: ");
-                SelectFarmhands(false, 0);
+                SelectFarmhands(0, inGame:false, hideBlank:true);
                 Console.ReadLine();
                 return true;
         }
@@ -64,7 +64,7 @@ namespace StardewValley.MPSaveEditor.Commands
             Console.WriteLine("Choose a farmhand: ");
             Console.WriteLine("1. <New Farmhand> (with cabin and player slot)");
             bool success = true;
-            var farmhands = SelectFarmhands(false, 1);
+            var farmhands = SelectFarmhands(1, inGame:false, hideBlank:true);
             var farmhandNumber = Prompt.GetInt(Purpose[PurposeEnum.AddToGame], 1);
             if (farmhandNumber == 1) {
                 Console.WriteLine("Adding new cabin and player slot...");
@@ -90,7 +90,7 @@ namespace StardewValley.MPSaveEditor.Commands
             Console.WriteLine("1. Yes");
             Console.WriteLine("2. No");
             var storeFarmhand = Prompt.GetInt("Store removed farmhand in storage? ", 1) == 1;
-            var farmhands = SelectFarmhands(true, 0);     
+            var farmhands = SelectFarmhands(0, inGame:true, hideBlank:false);     
             var farmhandNumber = Prompt.GetInt(Purpose[storeFarmhand ? PurposeEnum.RemoveAndStore : PurposeEnum.RemoveNoStore], 1);
             var farmhand = farmhands.ElementAt(farmhandNumber - 1);
             if (farmhand.Name != null) {
@@ -112,7 +112,7 @@ namespace StardewValley.MPSaveEditor.Commands
             Console.WriteLine("Choose a farmhand to change to the host of the saved game: ");
             Console.WriteLine(">> Host: " + _game.Host.Element("name")?.Value ?? "None?!");
             bool success = true;
-            var farmhands = SelectFarmhands(true, 0, hideBlank: true);
+            var farmhands = SelectFarmhands(0, inGame:true, hideBlank:true);
             var farmhandNumber = Prompt.GetInt(Purpose[PurposeEnum.SwitchHost], 1);  
             var farmhand = farmhands.ElementAt(farmhandNumber - 1);  
             var oldHost = _game.SwitchHost(farmhands.ElementAt(farmhandNumber - 1).Element);  
@@ -129,10 +129,10 @@ namespace StardewValley.MPSaveEditor.Commands
             Console.WriteLine("---------");
             Console.WriteLine("Choose the farmhands to switch: ");
             bool success = true;
-            var farmhandsFromGame = SelectFarmhands(true, 0, hideBlank: true);
+            var farmhandsFromGame = SelectFarmhands(0, inGame:true, hideBlank:true);
             var farmhandNumber = Prompt.GetInt(Purpose[PurposeEnum.SwitchFromGame], 1);  
             var currentFarmhand = farmhandsFromGame.ElementAt(farmhandNumber - 1);  
-            var farmhandsFromStorage = SelectFarmhands(false, 0);
+            var farmhandsFromStorage = SelectFarmhands(0, inGame:false, hideBlank:true);
             farmhandNumber = Prompt.GetInt(Purpose[PurposeEnum.SwitchFromStorage], 1); 
             var newFarmhand = farmhandsFromStorage.ElementAt(farmhandNumber - 1); 
             Console.WriteLine($"Switching {currentFarmhand.Name} with {newFarmhand.Name}...");
@@ -146,7 +146,7 @@ namespace StardewValley.MPSaveEditor.Commands
 
 
         // Returns a list of Farmhands, while also printing that list to the console
-       public IEnumerable<Farmhand> SelectFarmhands(bool inGame, int startingIndex, bool hideBlank = true) {
+       public IEnumerable<Farmhand> SelectFarmhands(int startingIndex, bool inGame,  bool hideBlank) {
             var farmhandCount = startingIndex;
             IEnumerable<Farmhand> farmhands; 
             if (inGame == true) {
@@ -154,9 +154,12 @@ namespace StardewValley.MPSaveEditor.Commands
             } else {
                 farmhands = _farmhands.FarmhandsInStorage;
             }
+            if (hideBlank) {
+                farmhands = farmhands.Where(x => x.Name != null);
+            }
             foreach (var fh in farmhands) {
                 farmhandCount++;
-                Console.WriteLine(string.Format("{0}. {1}", farmhandCount, fh.Name ?? "<No Farmhand>"));        
+                Console.WriteLine(string.Format("{0}. {1}", farmhandCount, fh.Name ?? "<No Farmhand (Empty Cabin)>"));        
             }
             return farmhands;
         }
