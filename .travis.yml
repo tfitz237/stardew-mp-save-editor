@@ -6,6 +6,9 @@ script:
 - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash ./scripts/deploy.sh; fi
 before_deploy:
   - bash ./scripts/predeploy.sh
+branch:
+   only:
+      - master
 #deploy:
 #  provider: releases
 #  api_key:
