@@ -1,4 +1,4 @@
-mono: none	 mono: none
-dotnet: 2.1.200	 dotnet: 2.1.200
-script:	 script:
+mono: none
+dotnet: 2.1.200
+script:
   - dotnet build
