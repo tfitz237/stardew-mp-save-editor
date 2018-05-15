@@ -14,7 +14,8 @@ Note: A copy of the original file and the modified file will be placed in the sa
 
 ### Run from command-line:
 To run Webapp on localhost:5000, `dotnet run`
-To run Electron app, `dotnet electron start`
+
+To run Electron app, `dotnet electronize start`
 
 #### List of commands available:
 Shows a list of the commands avaiable
