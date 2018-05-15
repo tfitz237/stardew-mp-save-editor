@@ -13,6 +13,8 @@ Run the executable from command line.
 Note: A copy of the original file and the modified file will be placed in the saves subdirectory.
 
 ### Run from command-line:
+To run Webapp on localhost:5000, `dotnet run`
+To run Electron app, `dotnet electron start`
 
 #### List of commands available:
 Shows a list of the commands avaiable
