@@ -33,11 +33,12 @@ namespace StardewValley.MPSaveEditor.Commands
 
         public int OnExecute() {
             try {
-                saveFilePath = CommandHelpers.GetSaveFile(String.Format("C:/Users/{0}/AppData/Roaming/StardewValley/Saves", Environment.UserName));
-                var saveGame = new SaveGame(saveFilePath);
-                var farmhand = SelectFarmhand(saveGame);
-                saveGame.SwitchHost(farmhand);
-                saveGame.SaveFile();
+
+                saveFilePath = CommandHelpers.GetSaveFile(CommandHelpers.GetSaveFolder());
+                var game = new SaveGame(saveFilePath);
+                var farmhand = SelectFarmhand(game);
+                game.SwitchHost(farmhand);
+                CommandHelpers.SaveFile(game); 
                 Console.Write("Done!");
                 Console.ReadLine();
                 return CommandHelpers.Success;

@@ -21,11 +21,11 @@ namespace StardewValley.MPSaveEditor.Commands {
         
         public int OnExecute() {
             try {
-                saveFilePath = CommandHelpers.GetSaveFile(String.Format("C:/Users/{0}/AppData/Roaming/StardewValley/Saves", Environment.UserName));
+                saveFilePath = CommandHelpers.GetSaveFile(CommandHelpers.GetSaveFolder());
                 var game = new SaveGame(saveFilePath);
                 var selectedCabin = SelectCabin(game);
                 game.RemoveCabin(selectedCabin);
-                game.SaveFile();
+                CommandHelpers.SaveFile(game); 
                 Console.Write("Done!");
                 Console.ReadLine();
                 return CommandHelpers.Success;
