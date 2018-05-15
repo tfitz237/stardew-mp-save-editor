@@ -16,4 +16,4 @@ deploy:
   file: "$TRAVIS_BUILD_DIR/releases/Stardew.MPSaveEditor-$TRAVIS_BUILD_ID.zip"
   tag: "$(git describe --tags)"
   on:
-    repo: tfitz237/stardew-mp-save-editor
+    tag: true
