@@ -3,7 +3,8 @@ language: csharp
 mono: none
 dotnet: 2.1.200
 script:
- - dotnet -c Release -r win10-x64 -o releases/Stardew.MPSaveEditor
+ - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then dotnet build fi'
+ - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then dotnet -c Release -r win10-x64 -o releases/Stardew.MPSaveEditor'
  - zip releases/Stardew.MPSaveEditor releases/Stardew.MPSaveEditor-${TRAVIS_BUILD_NUMBER}.zip
 branches:
    only: 
