@@ -50,6 +50,8 @@ namespace StardewValley.MPSaveEditor.Commands
             if (subProgram == 2) {
                 return RemoveFarmhand();
             }
+
+            return false;
         } 
 
         public bool AddFarmhand() {
