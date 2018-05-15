@@ -58,8 +58,8 @@ namespace StardewValley.MPSaveEditor.Models {
                 } 
                 else if (farmhand != null) {
                     cabin.SwitchFarmhand(farmhand.Element);
-                }
-                farmhand.Cabin = cabin;
+                    farmhand.Cabin = cabin;
+                }               
                 return true;
             }
             return false;
