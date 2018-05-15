@@ -4,9 +4,6 @@ dotnet: 2.1.200
 script:
 - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./scripts/build.sh; fi
 - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash ./scripts/deploy.sh; fi
-branches:
-  only:
-  - master
 before_deploy:
   - bash ./scripts/predeploy.sh
 #deploy:
