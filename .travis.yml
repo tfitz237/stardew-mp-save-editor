@@ -1,5 +1,5 @@
 language: csharp
 mono: none
-dotnet: 2.0
+dotnet: 2.1.200
 script:
  - dotnet build
