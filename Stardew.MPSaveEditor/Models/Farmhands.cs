@@ -81,13 +81,17 @@ namespace StardewValley.MPSaveEditor.Models {
                 farmhand.Element.Remove();
             }
         }
-        public void RemoveFarmhandFromCabin(Farmhand farmhand, bool storeFarmhand = true) {
+        public void RemoveFarmhandFromCabin(Farmhand farmhand, bool storeFarmhand = true, bool removeCabin = false) {
             if (farmhand.InGame) {
                 if (storeFarmhand) {
                     StoreFarmhand(farmhand);
                 }
-                var newFarmhand = CreateBlankFarmhandElement();
-                farmhand.Cabin.SwitchFarmhand(newFarmhand);
+                if (!removeCabin) {
+                    var newFarmhand = CreateBlankFarmhandElement();
+                    farmhand.Cabin.SwitchFarmhand(newFarmhand);
+                } else {
+                    farmhand.Cabin.Element.Remove();
+                }
             }
         }
 

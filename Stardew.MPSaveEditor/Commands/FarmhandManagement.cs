@@ -8,35 +8,17 @@ using StardewValley.MPSaveEditor.Helpers;
 
 namespace StardewValley.MPSaveEditor.Commands
 {
-    [Command(Name = "AddPlayers", Description = "Add Players", ThrowOnUnexpectedArgument = false)]
+    [Command(Name = "FarmhandManagement", Description = "Farmhand Management System. Manage all farmhands saved and stored.", ThrowOnUnexpectedArgument = false)]
     public class FarmhandManagementCommand {
         public string saveFilePath { get; set; }
         
         private SaveGame _game {get;set;}
-        private Farmhands _farmhands {get; set;}
-         public XElement SelectFarmhand(SaveGame saveGame) {
-            Dictionary<string, string> saveFiles = new Dictionary<String, String>();
-            Console.WriteLine("---------");
-            Console.WriteLine("Current Farmhands: ");
-            var farmhands = saveGame.Farmhands;            
-            var farmhandNames = saveGame.FarmhandNames;
-            
-            saveFiles = new Dictionary<string, string>();
-            int farmhandCount = 0;
-            foreach(var name in farmhandNames) {
-                farmhandCount++;
-                Console.WriteLine(String.Format("{0}. {1}", farmhandCount, name));
-            }
-            int farmhandNumber = Prompt.GetInt("Select a farmhand for management:", 1);
-            
-
-            return saveGame.GetFarmhandByName(farmhandNames.ElementAt(farmhandNumber - 1));
-        }      
+        private Farmhands _farmhands {get; set;}     
 
         public bool SelectProgram(SaveGame game, out bool done) {
             _game = game;
             done = false;
-            Console.WriteLine("---------");
+            Console.WriteLine("--------------------------------");
             Console.WriteLine("Farmhand Management System (FMS)");
             Console.WriteLine("--------------------------------");
             Console.WriteLine("Select a farmhand program: ");
@@ -46,16 +28,19 @@ namespace StardewValley.MPSaveEditor.Commands
             var subProgram = Prompt.GetInt("Choose a program", 0);
             _farmhands =  new Farmhands(game);
             if (subProgram == 0) {
-                Console.WriteLine("Current farmhands in game: ");
-                FindFarmhands(true, 0);
-                Console.ReadLine();
-                return true;
+                return ShowCurrentFarmhands();
             }
             if (subProgram == 1) {
                 return AddFarmhand();
             }
             if (subProgram == 2) {
                 return RemoveFarmhand();
+            }
+            if (subProgram == 3) {
+                return SwitchFarmhandByHost();
+            }
+            if (subProgram == 4) {               
+                return SwitchFarmhandByStorage();
             }
             if(subProgram == 5) {
                 done = true;
@@ -65,12 +50,21 @@ namespace StardewValley.MPSaveEditor.Commands
             return false;
         } 
 
+        public bool ShowCurrentFarmhands() {
+                Console.WriteLine("Current farmhands in game: ");
+                Console.WriteLine(" >> Host: " + _game.Host.Element("name")?.Value ?? "None?!");
+                SelectFarmhands(true, 0);
+                Console.WriteLine("Current farmhands in storage: ");
+                SelectFarmhands(false, 0);
+                Console.ReadLine();
+                return true;
+        }
         public bool AddFarmhand() {
             Console.WriteLine("---------");
             Console.WriteLine("Choose a farmhand: ");
             Console.WriteLine("1. <New Farmhand>");
             bool success = true;
-            var farmhands = FindFarmhands(false, 1);
+            var farmhands = SelectFarmhands(false, 1);
             var farmhandNumber = Prompt.GetInt(Purpose[PurposeEnum.AddToGame], 1);
             if (farmhandNumber == 1) {
                 success = _farmhands.AddFarmhand();
@@ -86,10 +80,70 @@ namespace StardewValley.MPSaveEditor.Commands
             return success;
         }
 
-        public IEnumerable<Farmhand> FindFarmhands(bool inGame, int startingIndex) {
+        public bool RemoveFarmhand() {
+            Console.WriteLine("---------");            
+            Console.WriteLine("Would you like to save the farmhand into storage for future use? ");
+            Console.WriteLine("1. Yes");
+            Console.WriteLine("2. No");
+            var storeFarmhand = Prompt.GetInt("Store removed farmhand in storage? ", 1) == 1;
+            var farmhands = SelectFarmhands(true, 0);     
+            var farmhandNumber = Prompt.GetInt(Purpose[storeFarmhand ? PurposeEnum.RemoveAndStore : PurposeEnum.RemoveNoStore], 1);
+            var farmhand = farmhands.ElementAt(farmhandNumber - 1);
+            Console.WriteLine("Do you also want to remove the cabin and player slot?");
+            Console.WriteLine("1. Yes");
+            Console.WriteLine("2. No");
+            var removeCabin = Prompt.GetInt("Remove cabin? ", 2) == 1;
+            _farmhands.RemoveFarmhandFromCabin(farmhand, storeFarmhand, removeCabin);
+            _farmhands.SaveFile();
+            CommandHelpers.SaveFile(_game);
+            return true;
+            
+        }
+
+        
+        public bool SwitchFarmhandByHost() {
+            Console.WriteLine("---------");
+            Console.WriteLine("Choose a farmhand to change to the host of the saved game: ");
+            Console.WriteLine(">> Host: " + _game.Host.Element("name")?.Value ?? "None?!");
+            bool success = true;
+            var farmhands = SelectFarmhands(true, 0);
+            var farmhandNumber = Prompt.GetInt(Purpose[PurposeEnum.SwitchHost], 1);  
+            var farmhand = farmhands.ElementAt(farmhandNumber - 1);  
+            var oldHost = _game.SwitchHost(farmhands.ElementAt(farmhandNumber - 1).Element);  
+            CommandHelpers.SaveFile(_game);          
+            return success;
+        }
+
+        public bool SwitchFarmhandByStorage() {
+            if (!_farmhands.FarmhandsInStorage.Any()) {
+                Console.WriteLine("No Farmhands found in storage for this save file.");
+                Console.ReadLine();
+                return false;
+            }
+            Console.WriteLine("---------");
+            Console.WriteLine("Choose the farmhands to switch: ");
+            bool success = true;
+            var farmhandsFromGame = SelectFarmhands(true, 0);
+            var farmhandNumber = Prompt.GetInt(Purpose[PurposeEnum.SwitchFromGame], 1);  
+            var currentFarmhand = farmhandsFromGame.ElementAt(farmhandNumber - 1);  
+            var farmhandsFromStorage = SelectFarmhands(false, 0);
+            farmhandNumber = Prompt.GetInt(Purpose[PurposeEnum.SwitchFromStorage], 1); 
+            var newFarmhand = farmhandsFromStorage.ElementAt(farmhandNumber - 1); 
+            Console.WriteLine($"Switching {currentFarmhand.Name} with {newFarmhand.Name}...");
+            _farmhands.StoreFarmhand(currentFarmhand);                            
+            currentFarmhand.Cabin.SwitchFarmhand(newFarmhand.Element);  
+            CommandHelpers.SaveFile(_game);   
+            _farmhands.RemoveFarmhandFromStorage(newFarmhand);   
+            _farmhands.SaveFile();        
+            return success;
+        }
+
+
+        // Returns a list of Farmhands, while also printing that list to the console
+       public IEnumerable<Farmhand> SelectFarmhands(bool inGame, int startingIndex) {
             var farmhandCount = startingIndex;
             IEnumerable<Farmhand> farmhands; 
-            if (inGame) {
+            if (inGame == true) {
                 farmhands =  _farmhands.FarmhandsInGame.Where(x => x.Name != null);    
             } else {
                 farmhands = _farmhands.FarmhandsInStorage;
@@ -99,23 +153,6 @@ namespace StardewValley.MPSaveEditor.Commands
                 Console.WriteLine(string.Format("{0}. {1}", farmhandCount, fh.Name));        
             }
             return farmhands;
-        }
-
-
-        public bool RemoveFarmhand() {
-            Console.WriteLine("---------");
-            Console.WriteLine("Would you like to save the farmhand into storage for future use? ");
-            Console.WriteLine("1. Yes");
-            Console.WriteLine("2. No");
-            var storeFarmhand = Prompt.GetInt("Store removed farmhand in storage? ", 1) == 1;
-            var farmhands = FindFarmhands(true, 0);     
-            var farmhandNumber = Prompt.GetInt(Purpose[storeFarmhand ? PurposeEnum.RemoveAndStore : PurposeEnum.RemoveNoStore], 1);
-            var farmhand = farmhands.ElementAt(farmhandNumber - 1);
-            _farmhands.RemoveFarmhandFromCabin(farmhand, storeFarmhand);
-            _farmhands.SaveFile();
-            CommandHelpers.SaveFile(_game);
-            return true;
-            
         }
 
         public int OnExecute() {
@@ -144,11 +181,11 @@ namespace StardewValley.MPSaveEditor.Commands
 
         public Dictionary<int, string> Commands = new Dictionary<int, string> {
             {0, "Show current farmhands"},
-            {1, "Add farmhand to game"},
-            {2, "Remove farmhand from game"},
+            {1, "Add farmhand to game (or new player slot and cabin)"},
+            {2, "Remove farmhand from game (or player slot and cabin)"},
             {3, "Switch farmhand with host of game"},
             {4, "Switch farmhand with stored farmhand"},
-            {5, "Close"}
+            {5, "Back"}
         };
 
 
@@ -156,16 +193,18 @@ namespace StardewValley.MPSaveEditor.Commands
             {PurposeEnum.AddToGame, "Select a farmhand to add to the game:"},
             {PurposeEnum.RemoveAndStore, "Select a farmhand to remove from the game and put in storage: "},
             {PurposeEnum.RemoveNoStore, "Select a farmhand to PERMANANTELY remove from the game: "},
-            {PurposeEnum.SwitchFromStorage, "Select a farmhand to retrieve from storage for switching: "},
-            {PurposeEnum.SwitchFromGame, "Select a farmhand to switch from the game: "}
+            {PurposeEnum.SwitchFromGame, "Select a farmhand to switch from the game: "},
+            {PurposeEnum.SwitchFromStorage, "Select a farmhand to switch from the storge: "},
+            {PurposeEnum.SwitchHost, "Select a farmhand to switch with the host of the saved game:"}
         };
 
         public enum PurposeEnum {
             AddToGame,
             RemoveAndStore,
             RemoveNoStore,
+            SwitchFromGame,
             SwitchFromStorage,
-            SwitchFromGame
+            SwitchHost,
         }
     }
 }

@@ -39,7 +39,7 @@ namespace StardewValley.MPSaveEditor.Helpers
                     saveFiles.Add(fileCount, saveFilePath);
                     Console.WriteLine(String.Format("{0}. {1}", fileCount, saveFileName));
                 }
-                userSelection = Prompt.GetInt("Select a save file:", 0);
+                userSelection = Prompt.GetInt("Select a save file:", 1);
             }
 
             return saveFiles[userSelection];
@@ -59,6 +59,7 @@ namespace StardewValley.MPSaveEditor.Helpers
                 overwriteFile = true;
             }
             game.SaveFile(overwriteFile);
+            Console.WriteLine("-------------------------------------------------------------------------------");
             if (overwriteFile) {
                 Console.WriteLine("Game Saved to your local Stardew Valley/Saves folder.");
                 Console.WriteLine("ORIGINAL Backup can be found in Stardew.MPSaveEditor/saves");
@@ -67,6 +68,7 @@ namespace StardewValley.MPSaveEditor.Helpers
                 Console.WriteLine("Copy the file over to your local StardewValley/Saves folder to see the changes.");
                 Console.WriteLine("ORIGINAL Backup can be found in Stardew.MPSaveEditor/saves");
             }
+            Console.ReadLine();
 
         }
 

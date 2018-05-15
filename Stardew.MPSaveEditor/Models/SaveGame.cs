@@ -122,10 +122,15 @@ namespace StardewValley.MPSaveEditor.Models {
         }
 
 
-        public void SwitchHost(XElement farmhand) {
+        public XElement SwitchHost(XElement farmhand) {
             var host = new XElement(Host);
             farmhand = new XElement(farmhand);
             var cabin = FindCabinByFarmhand(farmhand);
+            if (cabin != null) {
+                var cabinNPCs = new XElement(cabin.Element("indoors").Element("characters"));
+                FarmHouse.Element("characters").ReplaceAll(cabinNPCs.Nodes());
+                cabin.Element("indoors").Element("characters").ReplaceAll(FarmHouse.Element("characters").Nodes());
+            }
             farmhand.Element("eventsSeen").ReplaceAll(host.Element("eventsSeen").Nodes());
             farmhand.Element("caveChoice").Value = host.Element("caveChoice").Value;
             farmhand.Element("songsHeard").ReplaceAll(host.Element("songsHeard").Nodes());
@@ -136,33 +141,29 @@ namespace StardewValley.MPSaveEditor.Models {
             var farmhandRecentBed = new XElement(farmhand.Element("mostRecentBed"));
             var farmhandRecentPosition = new XElement(farmhand.Element("Position"));
             var farmhandHome = new XElement(farmhand.Element("homeLocation"));
-            var cabinNPCs = new XElement(cabin.Element("indoors").Element("characters"));
             farmhand.Element("houseUpgradeLevel").Value = host.Element("houseUpgradeLevel").Value;
             farmhand.Element("mostRecentBed").ReplaceAll(host.Element("mostRecentBed").Nodes());
             farmhand.Element("Position").ReplaceAll(host.Element("Position").Nodes());
             farmhand.Element("homeLocation").Value = host.Element("homeLocation").Value;
-            FarmHouse.Element("characters").ReplaceAll(cabinNPCs.Nodes());
+            
             host.Element("mostRecentBed").ReplaceAll(farmhandRecentPosition.Nodes());
             host.Element("Position").ReplaceAll(farmhandRecentBed.Nodes());
             host.Element("houseUpgradeLevel").Value = farmhandUpgradeLevel.Value;
             host.Element("homeLocation").Value = farmhandHome.Value;
             Host.ReplaceAll(farmhand.Nodes());
-            cabin.Element("indoors").Element("farmhand").ReplaceAll(host.Nodes());    
-            cabin.Element("indoors").Element("characters").ReplaceAll(FarmHouse.Element("characters").Nodes());
+            cabin.Element("indoors").Element("farmhand").ReplaceAll(host.Nodes());                
+            return host;
                    
         }
 
         public void RemoveCabin(XElement cabin) {
-            var farmhand = cabin.Element("indoors").Element("farmhand");
-            if (farmhand.Element("name").IsEmpty) {
+            var farmhand = new Farmhand(cabin.Element("indoors").Element("farmhand"));
+            if (farmhand.Name == null) {
                 cabin.Remove();
             } else {
-                var xdoc = new XDocument(farmhand);
-                Console.WriteLine("Saving backup of farmhand...");
-                System.IO.Directory.CreateDirectory("saves");
-                var dir = $"{_fileName}_{_timestamp.ToString("MMddyyHHmm")}";
-                System.IO.Directory.CreateDirectory($"saves\\{dir}");
-                xdoc.Save($"./saves/{dir}/{_fileName}_Farmhand_{farmhand.Element("name").Value}");
+                var farmhands = new Farmhands(this);
+                farmhands.StoreFarmhand(farmhand);
+                Console.WriteLine("Storing backup of farmhand...");
             }
             
         }
