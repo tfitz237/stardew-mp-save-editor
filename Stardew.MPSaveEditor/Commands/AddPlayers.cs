@@ -30,7 +30,7 @@ namespace StardewValley.MPSaveEditor.Commands {
                     newCabinCount--;
                 }
 
-                game.SaveFile();
+                CommandHelpers.SaveFile(game); 
                 Console.Write("Done!");
                 Console.ReadLine();
                 return CommandHelpers.Success;

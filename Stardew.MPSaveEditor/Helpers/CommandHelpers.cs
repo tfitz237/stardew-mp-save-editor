@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using McMaster.Extensions.CommandLineUtils;
+using StardewValley.MPSaveEditor.Models;
 
 namespace StardewValley.MPSaveEditor.Helpers
 {   
@@ -43,6 +44,33 @@ namespace StardewValley.MPSaveEditor.Helpers
 
             return saveFiles[userSelection];
         }
+
+        public static void SaveFile(SaveGame game) {
+            Console.WriteLine("---------");
+            Console.WriteLine("Would you like to overwrite the save file in the Stardew Valley/Saves folder?");
+            Console.WriteLine("-------------------------------------------------------------------------------");
+            Console.WriteLine("-- There will always be an ORIGINAL file saved in Stardew.MPSaveEditor/saves directory (by timestamp).");
+            Console.WriteLine("-- Type 'yes' without the quotes to overwrite.");
+            Console.WriteLine("-- Type anything else (or nothing) to not overwrite the save file.");
+            
+            Console.Write("Overwrite file? ");
+            var overwriteFile = false;
+            if (Console.ReadLine().ToLower() == "yes") {
+                overwriteFile = true;
+            }
+            game.SaveFile(overwriteFile);
+            if (overwriteFile) {
+                Console.WriteLine("Game Saved to your local Stardew Valley/Saves folder.");
+                Console.WriteLine("ORIGINAL Backup can be found in Stardew.MPSaveEditor/saves");
+            } else {
+                Console.WriteLine("Game saved to the Stardew.MPSaveEditor/saves");
+                Console.WriteLine("Copy the file over to your local StardewValley/Saves folder to see the changes.");
+                Console.WriteLine("ORIGINAL Backup can be found in Stardew.MPSaveEditor/saves");
+            }
+
+        }
+
+
     }
 
 }

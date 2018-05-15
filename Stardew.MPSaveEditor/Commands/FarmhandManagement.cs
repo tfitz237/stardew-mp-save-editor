@@ -33,8 +33,9 @@ namespace StardewValley.MPSaveEditor.Commands
             return saveGame.GetFarmhandByName(farmhandNames.ElementAt(farmhandNumber - 1));
         }      
 
-        public bool SelectProgram(SaveGame game) {
+        public bool SelectProgram(SaveGame game, out bool done) {
             _game = game;
+            done = false;
             Console.WriteLine("---------");
             Console.WriteLine("Farmhand Management System (FMS)");
             Console.WriteLine("--------------------------------");
@@ -42,13 +43,23 @@ namespace StardewValley.MPSaveEditor.Commands
             foreach(var command in Commands) {
                 Console.WriteLine(string.Format("{0}. {1}", command.Key, command.Value));
             }
-            var subProgram = Prompt.GetInt("Choose a program");
+            var subProgram = Prompt.GetInt("Choose a program", 0);
             _farmhands =  new Farmhands(game);
+            if (subProgram == 0) {
+                Console.WriteLine("Current farmhands in game: ");
+                FindFarmhands(true, 0);
+                Console.ReadLine();
+                return true;
+            }
             if (subProgram == 1) {
                 return AddFarmhand();
             }
             if (subProgram == 2) {
                 return RemoveFarmhand();
+            }
+            if(subProgram == 5) {
+                done = true;
+                return true;
             }
 
             return false;
@@ -63,11 +74,14 @@ namespace StardewValley.MPSaveEditor.Commands
             var farmhandNumber = Prompt.GetInt(Purpose[PurposeEnum.AddToGame], 1);
             if (farmhandNumber == 1) {
                 success = _farmhands.AddFarmhand();
-                _game.SaveFile();                                
+                _farmhands.SaveFile();
+                CommandHelpers.SaveFile(_game);                                
             }
             if (farmhandNumber > 1) {
                 var farmhand = farmhands.ElementAt(farmhandNumber - 2);
                 success = _farmhands.AddFarmhand(farmhand);
+                _farmhands.SaveFile();
+                CommandHelpers.SaveFile(_game);   
             }
             return success;
         }
@@ -76,7 +90,7 @@ namespace StardewValley.MPSaveEditor.Commands
             var farmhandCount = startingIndex;
             IEnumerable<Farmhand> farmhands; 
             if (inGame) {
-                farmhands =  _farmhands.FarmhandsInGame;
+                farmhands =  _farmhands.FarmhandsInGame.Where(x => x.Name != null);    
             } else {
                 farmhands = _farmhands.FarmhandsInStorage;
             }
@@ -99,6 +113,7 @@ namespace StardewValley.MPSaveEditor.Commands
             var farmhand = farmhands.ElementAt(farmhandNumber - 1);
             _farmhands.RemoveFarmhandFromCabin(farmhand, storeFarmhand);
             _farmhands.SaveFile();
+            CommandHelpers.SaveFile(_game);
             return true;
             
         }
@@ -108,13 +123,16 @@ namespace StardewValley.MPSaveEditor.Commands
 
                 saveFilePath = CommandHelpers.GetSaveFile(CommandHelpers.GetSaveFolder());
                 var saveGame = new SaveGame(saveFilePath);
-                var result = SelectProgram(saveGame);
-                if (result) {
-                    Console.WriteLine("Done!");
-                } else {
-                    Console.WriteLine("Something went wrong...");
+                bool done = false;
+                bool result = false;
+                while (!done) {
+                    result = SelectProgram(saveGame, out done);
+                    if (result) {
+                        Console.WriteLine("Done!");
+                    } else {
+                        Console.WriteLine("Something went wrong...");
+                    }
                 }
-                    Console.ReadLine();
                 return result ? CommandHelpers.Success : CommandHelpers.Failure;
             } 
             catch (Exception ex) {
@@ -125,10 +143,12 @@ namespace StardewValley.MPSaveEditor.Commands
         }
 
         public Dictionary<int, string> Commands = new Dictionary<int, string> {
+            {0, "Show current farmhands"},
             {1, "Add farmhand to game"},
             {2, "Remove farmhand from game"},
             {3, "Switch farmhand with host of game"},
-            {4, "Switch farmhand with stored farmhand"}
+            {4, "Switch farmhand with stored farmhand"},
+            {5, "Close"}
         };
 
 

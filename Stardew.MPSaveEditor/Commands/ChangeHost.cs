@@ -35,10 +35,10 @@ namespace StardewValley.MPSaveEditor.Commands
             try {
 
                 saveFilePath = CommandHelpers.GetSaveFile(CommandHelpers.GetSaveFolder());
-                var saveGame = new SaveGame(saveFilePath);
-                var farmhand = SelectFarmhand(saveGame);
-                saveGame.SwitchHost(farmhand);
-                saveGame.SaveFile();
+                var game = new SaveGame(saveFilePath);
+                var farmhand = SelectFarmhand(game);
+                game.SwitchHost(farmhand);
+                CommandHelpers.SaveFile(game); 
                 Console.Write("Done!");
                 Console.ReadLine();
                 return CommandHelpers.Success;

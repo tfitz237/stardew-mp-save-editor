@@ -23,23 +23,23 @@ namespace StardewValley.MPSaveEditor.Models {
 
 
         public void FindFarmhands(SaveGame game) {
+            var farmhandNames = game.FarmhandNames.ToList();
+            farmhandNames.Add(game.Host.Element("name").Value);
+            Swap(farmhandNames, 0, farmhandNames.Count() - 1);
             var fileName = "";
             var hasFarmhands = false;
-            foreach(var farmhand in game.FarmhandNames) {
+            foreach(var farmhand in farmhandNames) {
                 fileName = $"{farmhand}_{game.UniqueId}_farmhands";
                 hasFarmhands = LoadFile(fileName);
-                if (hasFarmhands) {                                        
-                   break;
-                }
+                if (hasFarmhands)                                         
+                    break;
             }
-            _fileName = fileName;
             if (!hasFarmhands) {
-                fileName = $"{game.Host.Element("name").Value}_{game.UniqueId}_farmhands";
-                if (!LoadFile(fileName)) {
                     _doc = new XDocument(new XElement("Farmhands"));                
                     _farmhands = _doc.Element("Farmhands")?.Elements();   
-                    _fileName = fileName;
-                }
+                    _fileName = $"{game.Host.Element("name").Value}_{game.UniqueId}_farmhands";;
+            } else {
+                _fileName = fileName;
             }
             
             PopulateFarmhands();
@@ -58,8 +58,9 @@ namespace StardewValley.MPSaveEditor.Models {
                     cabin = _game.CreateNewCabin(farmhand);
                 } 
                 else if (farmhand != null) {
-                    cabin.SwitchFarmhand(farmhand.Element);
+                    cabin.SwitchFarmhand(new XElement(farmhand.Element));
                     farmhand.Cabin = cabin;
+                    farmhand.Element.Remove();
                 }               
                 return true;
             }
@@ -124,12 +125,19 @@ namespace StardewValley.MPSaveEditor.Models {
             System.IO.Directory.CreateDirectory("farmhands");
             _doc.Save($"./farmhands/{_fileName}");
         }
+        public static List<T> Swap<T>(List<T> list, int indexA, int indexB)
+        {
+            T tmp = list[indexA];
+            list[indexA] = list[indexB];
+            list[indexB] = tmp;
+            return list;
+        }
     }
 
     public class Farmhand {
         public XElement Element {get;set;}
 
-        public string Name => Element.Element("name")?.Value;
+        public string Name => Element.Element("name").IsEmpty ? null : Element.Element("name").Value;
         public Cabin Cabin {get;set;}
 
         public bool InGame => Cabin != null;

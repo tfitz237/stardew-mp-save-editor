@@ -86,12 +86,15 @@ namespace StardewValley.MPSaveEditor.Models {
             return null;
         }
             
-        public void SaveFile() {
+        public void SaveFile(bool overwriteSaveFile = false) {
             System.IO.Directory.CreateDirectory("saves");
             var dir = $"{_fileName}_{_timestamp.ToString("MMddyyHHmm")}";
             System.IO.Directory.CreateDirectory($"saves\\{dir}");
             _originalDoc.Save($"./saves/{dir}/{_fileName}_ORIGINAL");
             _doc.Save($"./saves/{dir}/{_fileName}");
+            if (overwriteSaveFile) {
+                _doc.Save(_path);
+            }
         }
 
         public bool MoveToValidLocation(Cabin cabin) {
