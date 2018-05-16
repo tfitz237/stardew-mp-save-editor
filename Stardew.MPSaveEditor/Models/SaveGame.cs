@@ -141,8 +141,22 @@ namespace StardewValley.MPSaveEditor.Models {
             cabin = cabin ?? FindCabinByFarmhand(farmhand);
             if (cabin != null) {
                 var cabinNPCs = new XElement(cabin.Element("indoors").Element("characters"));
-                FarmHouse.Element("characters").ReplaceAll(cabinNPCs.Nodes());
-                cabin.Element("indoors").Element("characters").ReplaceAll(FarmHouse.Element("characters").Nodes());
+                var cabinId = cabin.Element("indoors").Element("uniqueName")?.Value;
+                var farmhouseNPCs = new XElement(FarmHouse.Element("characters"));
+                if (!cabinNPCs.IsEmpty) {
+                    foreach (var cabinNpc in cabinNPCs?.Elements()) {
+                        cabinNpc.Element("defaultMap").Value = "FarmHouse";
+                        cabinNpc.Element("DefaultMap").Value = "FarmHouse";                   
+                    }
+                    FarmHouse.Element("characters").ReplaceAll(cabinNPCs.Nodes());
+                }
+                if (!farmhouseNPCs.IsEmpty) {
+                    foreach (var cabinNpc in cabinNPCs?.Elements()) {
+                        cabinNpc.Element("defaultMap").Value = cabinId;
+                        cabinNpc.Element("DefaultMap").Value = cabinId;                   
+                    }
+                    cabin.Element("indoors").Element("characters").ReplaceAll(farmhouseNPCs.Nodes());
+                }
             }   
             farmhand.Element("eventsSeen").ReplaceAll(host.Element("eventsSeen").Nodes());
             farmhand.Element("caveChoice").Value = host.Element("caveChoice").Value;
