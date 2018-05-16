@@ -93,13 +93,15 @@ namespace StardewValley.MPSaveEditor.Commands
             var farmhands = SelectFarmhands(0, inGame:true, hideBlank:false);     
             var farmhandNumber = Prompt.GetInt(Purpose[storeFarmhand ? PurposeEnum.RemoveAndStore : PurposeEnum.RemoveNoStore], 1);
             var farmhand = farmhands.ElementAt(farmhandNumber - 1);
+            var removeCabin = true;
             if (farmhand.Name != null) {
                 Console.WriteLine("Do you also want to remove the cabin and player slot?");
                 Console.WriteLine("1. Yes");
                 Console.WriteLine("2. No");
-                var removeCabin = Prompt.GetInt("Remove cabin? ", 2) == 1;
-                _farmhands.RemoveFarmhandFromCabin(farmhand, storeFarmhand, removeCabin);
+                removeCabin = Prompt.GetInt("Remove cabin? ", 2) == 1;
             }
+            _farmhands.RemoveFarmhandFromCabin(farmhand, storeFarmhand, removeCabin);
+            
             _farmhands.SaveFile();
             CommandHelpers.SaveFile(_game);
             return true;
@@ -115,7 +117,7 @@ namespace StardewValley.MPSaveEditor.Commands
             var farmhands = SelectFarmhands(0, inGame:true, hideBlank:true);
             var farmhandNumber = Prompt.GetInt(Purpose[PurposeEnum.SwitchHost], 1);  
             var farmhand = farmhands.ElementAt(farmhandNumber - 1);  
-            var oldHost = _game.SwitchHost(farmhands.ElementAt(farmhandNumber - 1).Element);  
+            _game.SwitchHost(farmhands.ElementAt(farmhandNumber - 1).Cabin);  
             CommandHelpers.SaveFile(_game);          
             return success;
         }
@@ -137,7 +139,7 @@ namespace StardewValley.MPSaveEditor.Commands
             var newFarmhand = farmhandsFromStorage.ElementAt(farmhandNumber - 1); 
             Console.WriteLine($"Switching {currentFarmhand.Name} with {newFarmhand.Name}...");
             _farmhands.StoreFarmhand(currentFarmhand);                            
-            currentFarmhand.Cabin.SwitchFarmhand(newFarmhand.Element);  
+            currentFarmhand.Cabin.SwitchCabin(newFarmhand.Cabin);  
             CommandHelpers.SaveFile(_game);   
             _farmhands.RemoveFarmhandFromStorage(newFarmhand);   
             _farmhands.SaveFile();        
@@ -146,14 +148,17 @@ namespace StardewValley.MPSaveEditor.Commands
 
 
         // Returns a list of Farmhands, while also printing that list to the console
-       public IEnumerable<Farmhand> SelectFarmhands(int startingIndex, bool inGame,  bool hideBlank) {
+       public IEnumerable<Farmhand> SelectFarmhands(int startingIndex, bool? inGame,  bool hideBlank) {
             var farmhandCount = startingIndex;
             IEnumerable<Farmhand> farmhands; 
             if (inGame == true) {
                 farmhands =  _farmhands.FarmhandsInGame;    
-            } else {
+            } else if (inGame == false) {
                 farmhands = _farmhands.FarmhandsInStorage;
+            } else {
+                farmhands = _farmhands.AllFarmhands;
             }
+            
             if (hideBlank) {
                 farmhands = farmhands.Where(x => x.Name != null);
             }

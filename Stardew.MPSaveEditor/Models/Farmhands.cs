@@ -46,29 +46,25 @@ namespace StardewValley.MPSaveEditor.Models {
         }
 
         public void PopulateFarmhands() {
-            FarmhandsInGame = _game.Cabins.Select(x => new Farmhand(x, isCabin: true));
-            FarmhandsInStorage = _farmhands.Select(x => new Farmhand(x));
+            FarmhandsInGame = _game.Cabins.Select(x => new Farmhand(x, inGame:true, isCabin: true));
+            FarmhandsInStorage = _farmhands.Select(x => new Farmhand(x, inGame:false));
 
         }
 
         public bool AddFarmhand(Farmhand farmhand = null) {
             if (farmhand == null) {
-                var cabin = _game.CreateNewCabin(farmhand);
-                if (cabin == null) {
-                    return false;
-                }  
-                return true;
+                var cabin = _game.CreateNewCabin();
+                return cabin != null;
             } else {
-                var cabin = _game.FindEmptyCabin();
-                                
+                var cabin = _game.FindEmptyCabin();                               
                 if (cabin == null) {
-                    cabin = _game.CreateNewCabin(farmhand);
+                    cabin = _game.CreateNewCabin(farmhand.Cabin);
                     if (cabin == null)
                         return false;
                 }  
-                cabin.SwitchFarmhand(new XElement(farmhand.Element));
-                farmhand.Cabin = cabin;
-                farmhand.Element.Remove();                             
+                cabin.SwitchCabin(farmhand.Cabin);
+                farmhand.Cabin = cabin;    
+                RemoveFarmhandFromStorage(farmhand);                        
                 return true;
             }
         }
@@ -76,15 +72,15 @@ namespace StardewValley.MPSaveEditor.Models {
         public void StoreFarmhand(Farmhand farmhand) {
             var element = _farmhands.FirstOrDefault(x => x.Element("name")?.Value == farmhand.Name);
             if (element == null) {
-                _doc.Element("Farmhands").Add(new XElement(farmhand.Element));
+                _doc.Element("Farmhands").Add(farmhand.Cabin.Element);
             } else {
-                element.ReplaceAll(farmhand.Element.Nodes());
+                element.ReplaceAll(farmhand.Cabin.Element.Nodes());
             }
         }
 
         public void RemoveFarmhandFromStorage(Farmhand farmhand) {
             if (farmhand.InStorage) {
-                farmhand.Element.Remove();
+                farmhand.Cabin.Element.Remove();
             }
         }
         public void RemoveFarmhandFromCabin(Farmhand farmhand, bool storeFarmhand = true, bool removeCabin = false) {
@@ -108,9 +104,6 @@ namespace StardewValley.MPSaveEditor.Models {
                 return new XElement(blankFarmhand);
         }
 
-        public void SwitchFarmhands(Farmhand inGame, Farmhand inStorage) {
-            inGame.Cabin.SwitchFarmhand(inStorage.Element);
-        }
 
 
         public IEnumerable<Farmhand> AllFarmhands => FarmhandsInStorage.Concat(FarmhandsInGame);
@@ -145,30 +138,19 @@ namespace StardewValley.MPSaveEditor.Models {
     }
 
     public class Farmhand {
-        public XElement Element {get;set;}
 
-        public string Name => Element.Element("name").IsEmpty ? null : Element.Element("name").Value;
+        public string Name => Cabin.Farmhand.Element("name").IsEmpty ? null : Cabin.Farmhand.Element("name").Value;
         public Cabin Cabin {get;set;}
 
-        public bool InGame => Cabin != null;
+        public bool InGame  {get;set;}
 
-        public bool InStorage => Cabin == null;
+        public bool InStorage {get;set;}
 
-        public Farmhand(XElement element, bool isCabin = false) {
-            if (isCabin) {
-                Cabin = new Cabin(element);
-                Element = Cabin.Farmhand;
-            } else {
-                Element = element;
-            }
-
+        public Farmhand(XElement element, bool inGame, bool isCabin = false) {
+            InGame = inGame;
+            InStorage = !InGame;
+            Cabin = new Cabin(element);
         }
-        public Farmhand(Cabin cabin) {
-            Cabin = cabin;
-            Element = Cabin.Farmhand;
-        }
-
-
     }
 
 }

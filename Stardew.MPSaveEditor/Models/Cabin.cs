@@ -37,17 +37,13 @@ namespace StardewValley.MPSaveEditor.Models {
         public int Width => Int32.Parse(Element.Element("tilesWide").Value);
 
 
-        public void CreateCabin(Farmhand farmhand = null) {
+        public void CreateCabin() {
             XDocument template = XDocument.Load(templatePath);
             var blankCabin = template.Element("template")
                 .Element("Building");
             Element = new XElement(blankCabin);
             ReplaceCabinName();
-            if (farmhand != null) {
-                Farmhand.ReplaceAll(farmhand.Element.Nodes());
-            } else {
-                  ReplaceMultiplayerId();
-            }
+            ReplaceMultiplayerId();            
             ReplaceCabinType();
         }
 
@@ -80,6 +76,16 @@ namespace StardewValley.MPSaveEditor.Models {
 
         public void SwitchFarmhand(XElement farmhand) {
             Farmhand.ReplaceAll(farmhand.Nodes());
+        }
+
+        public void SwitchCabin(Cabin cabin) {
+            var element = new XElement(cabin.Element);
+            var x = TileX;
+            var y = TileY;
+            TileX = x;
+            TileY = y;
+            cabin.UpdateFarmhand(Farmhand);
+            Element.ReplaceAll(cabin.Element.Nodes());
         }
 
         public XElement Farmhand => Element.Element("indoors").Element("farmhand");
