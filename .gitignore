@@ -1,7 +1,6 @@
 .vscode/
 bin/
 obj/
-Stardew.MPSaveEditor/saves/*
-Stardew.MPSaveEditor/releases/Stardew.MPSaveEditor/*
-Stardew.MPSaveEditor/Stardew.MpSaveEditor.zip
-Stardew.MPSaveEditor/Stardew.MPSaveEditor/
+saves/
+farmhands/
+releases/
