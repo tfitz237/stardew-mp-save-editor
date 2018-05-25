@@ -76,9 +76,11 @@ namespace StardewValley.MPSaveEditor.Models {
             .Select(x => 
                 x.Element("name").Value);
         
-        public Cabin CreateNewCabin(Farmhand farmhand = null) {
-            var cabin = new Cabin();
-            cabin.CreateCabin(farmhand);
+        public Cabin CreateNewCabin(Cabin cabin = null) {
+            if (cabin == null) {
+                cabin = new Cabin();
+                cabin.CreateCabin();
+            }
             cabin.UpdateFarmhand(Host);
             UpdateHost();
             var moved = MoveToValidLocation(cabin);
@@ -129,15 +131,33 @@ namespace StardewValley.MPSaveEditor.Models {
             Host.Element("slotCanHost").Value = "true";
             _saveGameInfoDoc.Element("Farmer").Element("slotCanHost").Value = "true";
         }
-        public XElement SwitchHost(XElement farmhand) {
+
+        public XElement SwitchHost(Cabin cabin) {       
+            return SwitchHost(cabin.Farmhand, cabin.Element);    
+        }
+        public XElement SwitchHost(XElement farmhand, XElement cabin = null) {
             var host = new XElement(Host);
             farmhand = new XElement(farmhand);
-            var cabin = FindCabinByFarmhand(farmhand);
+            cabin = cabin ?? FindCabinByFarmhand(farmhand);
             if (cabin != null) {
                 var cabinNPCs = new XElement(cabin.Element("indoors").Element("characters"));
-                FarmHouse.Element("characters").ReplaceAll(cabinNPCs.Nodes());
-                cabin.Element("indoors").Element("characters").ReplaceAll(FarmHouse.Element("characters").Nodes());
-            }
+                var cabinId = cabin.Element("indoors").Element("uniqueName")?.Value;
+                var farmhouseNPCs = new XElement(FarmHouse.Element("characters"));
+                if (!cabinNPCs.IsEmpty) {
+                    foreach (var cabinNpc in cabinNPCs?.Elements()) {
+                        cabinNpc.Element("defaultMap").Value = "FarmHouse";
+                        cabinNpc.Element("DefaultMap").Value = "FarmHouse";                   
+                    }
+                    FarmHouse.Element("characters").ReplaceAll(cabinNPCs.Nodes());
+                }
+                if (!farmhouseNPCs.IsEmpty) {
+                    foreach (var cabinNpc in cabinNPCs?.Elements()) {
+                        cabinNpc.Element("defaultMap").Value = cabinId;
+                        cabinNpc.Element("DefaultMap").Value = cabinId;                   
+                    }
+                    cabin.Element("indoors").Element("characters").ReplaceAll(farmhouseNPCs.Nodes());
+                }
+            }   
             farmhand.Element("eventsSeen").ReplaceAll(host.Element("eventsSeen").Nodes());
             farmhand.Element("caveChoice").Value = host.Element("caveChoice").Value;
             farmhand.Element("songsHeard").ReplaceAll(host.Element("songsHeard").Nodes());
@@ -164,7 +184,7 @@ namespace StardewValley.MPSaveEditor.Models {
         }
 
         public void RemoveCabin(XElement cabin) {
-            var farmhand = new Farmhand(cabin.Element("indoors").Element("farmhand"));
+            var farmhand = new Farmhand(cabin, true, isCabin:true);
             if (farmhand.Name == null) {
                 cabin.Remove();
             } else {

@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+
 using McMaster.Extensions.CommandLineUtils;
+
 using StardewValley.MPSaveEditor.Commands;
+using StardewValley.MPSaveEditor.Utilities;
 
 namespace StardewValley.MPSaveEditor
 {
@@ -16,9 +19,7 @@ namespace StardewValley.MPSaveEditor
         };
         static int Main(string[] args)
         {   
-
-
-
+            Console.WriteLine(new VersionChecker().run());
             var app = new CommandLineApplication();
             app.HelpOption();
             app.ThrowOnUnexpectedArgument = false;
