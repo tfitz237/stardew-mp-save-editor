@@ -1,11 +1,15 @@
 language: csharp
+dotnet: 2.1
 mono: none
-dotnet: 2.1.200
+
 script:
+  - bash ./scripts/test.sh;
   - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./scripts/build.sh; fi
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash ./scripts/deploy.sh; fi
+
 before_deploy:
-- python ./scripts/predeploy.py
+  - python ./scripts/predeploy.py
+
 deploy:
   provider: releases
   api_key:
