@@ -5,22 +5,28 @@ import subprocess
 from pkg_resources import parse_version
 
 
-def find_current_version(versions):
-    current_version = "0.0.0"
-    for version in versions:
-        if parse_version(version) > parse_version(current_version):
-            current_version = version
-    return current_version
+def get_existing_versions():
+    git_tags = subprocess.check_output(["git", "tag"]).split()
+    return [x for x in git_tags if x.replace(".", "").isdigit()]
+
+def get_new_version(source_path):
+    with open(source_path) as source_file:
+        stardew_source = source_file.read()
+    result = re.search("static String VERSION = \"(.*)\";", stardew_source)
+    return result.group(1)
 
 
-git_tags = subprocess.check_output(["git", "tag"]).split()
+existing_versions = get_existing_versions()
+new_version = get_new_version("Stardew.MPSaveEditor/StardewSaveEditor.cs")
 
-versions = [x for x in git_tags if x.replace(".", "").isdigit()]
-current_version_digits = find_current_version(versions).split(".")
-current_version_digits[-1] = str(int(current_version_digits[-1]) + 1)
-new_version = ".".join(current_version_digits)
-subprocess.call(["git", "tag", new_version])
-os.environ["TRAVIS_TAG"] = new_version
+if all([parse_version(new_version) > parse_version(existing_version) for existing_version in existing_versions]):
+    subprocess.call(["git", "tag", new_version])
+    os.environ["TRAVIS_TAG"] = "v" + new_version
 
-subprocess.call(["git", "config", "--local", "user.name", "\"Travis CI - Deploy\""])
-subprocess.call(["git", "config", "--local", "user.email", "\"travis@travisci.org\""])
+    subprocess.call(["git", "config", "--local", "user.name", "\"Travis CI - Deploy\""])
+    subprocess.call(["git", "config", "--local", "user.email", "\"travis@travisci.org\""])
+
+# May use this later to make logic more sophisticated
+# current_version_digits = find_current_version(versions).split(".")
+# current_version_digits[-1] = str(int(current_version_digits[-1]) + 1)
+# new_version = ".".join(current_version_digits)

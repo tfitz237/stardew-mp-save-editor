@@ -11,15 +11,16 @@ using StardewValley.MPSaveEditor.Utilities;
 
 namespace StardewValley.MPSaveEditor
 {
-    class Program
-    {
+    class StardewSaveEditor
+    {   
+        static String VERSION = "v0.1.4";
         static Dictionary<int, string> Commands = new Dictionary<int, string> {
             { 0, "Farmhand Management System (FMS)"},
             { 1, "Close"}
         };
         static int Main(string[] args)
         {   
-            Console.WriteLine(new VersionChecker().run());
+            Console.WriteLine(new VersionChecker().run(VERSION));
             var app = new CommandLineApplication();
             app.HelpOption();
             app.ThrowOnUnexpectedArgument = false;
