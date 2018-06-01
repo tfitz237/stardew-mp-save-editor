@@ -12,11 +12,11 @@ namespace StardewValley.MPSaveEditor.Utilities {
         
         private static HttpClient gitClient = new HttpClient();
 
-        public String run() {
+        public String run(String currentVersion) {
             String result;
             var response = this.getReleases();
             var latestVersion = this.parseResponse(response);
-            result = this.compareVersions(latestVersion);
+            result = this.compareVersions(currentVersion, latestVersion);
             return result;
         }
         
@@ -45,11 +45,11 @@ namespace StardewValley.MPSaveEditor.Utilities {
             return versionStatus;
         }
 
-        private String compareVersions(String latestVersionName) {
+        private String compareVersions(String currentVersionName, String latestVersionName) {
             String versionStatus;
 
             var latestVersion = new Version(latestVersionName);
-            var currentVersion = new Version("1.1.4");
+            var currentVersion = new Version(currentVersionName);
             if (latestVersion.CompareTo(currentVersion) > 0) {
                 versionStatus = String.Format("Version {0} of the Stardew Valley Multiplayer Save Editor is now available. You can download it from https://github.com/tfitz237/stardew-mp-save-editor/releases.", latestVersionName);
             }
