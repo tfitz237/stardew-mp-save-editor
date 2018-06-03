@@ -39,6 +39,13 @@ namespace StardewValley.MPSaveEditor.Helpers
                     saveFiles.Add(fileCount, saveFilePath);
                     Console.WriteLine(String.Format("{0}. {1}", fileCount, saveFileName));
                 }
+                foreach (String saveFolder in Directory.GetDirectories("./saves")) {
+                    fileCount++;
+                    String saveFileName = Regex.Matches(saveFolder, @"\\([^\\]*)_")[0].Groups[1].ToString();
+                    String saveFilePath = String.Format("{0}/{1}", saveFolder, saveFileName).Replace("\\", "/");
+                    saveFiles.Add(fileCount, saveFilePath);
+                    Console.WriteLine(String.Format("{0}. {1}", fileCount, saveFileName));
+                }
                 userSelection = Prompt.GetInt("Select a save file:", 1);
             }
 
@@ -69,11 +76,6 @@ namespace StardewValley.MPSaveEditor.Helpers
                 Console.WriteLine("Copy the file over to your local StardewValley/Saves folder to see the changes.");
                 Console.WriteLine("ORIGINAL Backup can be found in Stardew.MPSaveEditor/saves");
             }
-            Console.ReadLine();
-
         }
-
-
     }
-
 }

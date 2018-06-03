@@ -12,13 +12,9 @@ namespace StardewValley.MPSaveEditor.Commands {
 
     [Command(Name = "RemoveCabin", Description = "Remove Cabin", ThrowOnUnexpectedArgument = false)]
     public class RemoveCabinCommand {
-
-
-
         public int newCabinCount {get; set;}
-        
-        public string saveFilePath { get; set; }        
-        
+        public string saveFilePath { get; set; }
+
         public int OnExecute() {
             try {
                 saveFilePath = CommandHelpers.GetSaveFile(CommandHelpers.GetSaveFolder());
@@ -36,6 +32,7 @@ namespace StardewValley.MPSaveEditor.Commands {
                 return CommandHelpers.Failure;     
             }
         }
+
         public XElement SelectCabin(SaveGame saveGame) {
             Dictionary<string, string> saveFiles = new Dictionary<String, String>();
             Console.WriteLine("---------");
@@ -52,7 +49,6 @@ namespace StardewValley.MPSaveEditor.Commands {
             }
             int farmhandNumber = Prompt.GetInt("Select a cabin to be removed:", 1);
             
-
             return cabins.ElementAt(farmhandNumber - 1);
         }     
     }

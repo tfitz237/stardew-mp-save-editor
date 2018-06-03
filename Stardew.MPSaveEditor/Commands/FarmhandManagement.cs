@@ -56,7 +56,6 @@ namespace StardewValley.MPSaveEditor.Commands
                 SelectFarmhands(0, inGame:true, hideBlank:false);
                 Console.WriteLine("Current farmhands in storage: ");
                 SelectFarmhands(0, inGame:false, hideBlank:true);
-                Console.ReadLine();
                 return true;
         }
         public bool AddFarmhand() {
@@ -108,7 +107,6 @@ namespace StardewValley.MPSaveEditor.Commands
             
         }
 
-        
         public bool SwitchFarmhandByHost() {
             Console.WriteLine("---------");
             Console.WriteLine("Choose a farmhand to change to the host of the saved game: ");
@@ -125,7 +123,6 @@ namespace StardewValley.MPSaveEditor.Commands
         public bool SwitchFarmhandByStorage() {
             if (!_farmhands.FarmhandsInStorage.Any()) {
                 Console.WriteLine("No Farmhands found in storage for this save file.");
-                Console.ReadLine();
                 return false;
             }
             Console.WriteLine("---------");
@@ -145,7 +142,6 @@ namespace StardewValley.MPSaveEditor.Commands
             _farmhands.SaveFile();        
             return success;
         }
-
 
         // Returns a list of Farmhands, while also printing that list to the console
        public IEnumerable<Farmhand> SelectFarmhands(int startingIndex, bool? inGame,  bool hideBlank) {
@@ -171,7 +167,6 @@ namespace StardewValley.MPSaveEditor.Commands
 
         public int OnExecute() {
             try {
-
                 saveFilePath = CommandHelpers.GetSaveFile(CommandHelpers.GetSaveFolder());
                 var saveGame = new SaveGame(saveFilePath);
                 bool done = false;
@@ -179,10 +174,11 @@ namespace StardewValley.MPSaveEditor.Commands
                 while (!done) {
                     result = SelectProgram(saveGame, out done);
                     if (result) {
-                        Console.WriteLine("Done!");
+                        Console.Write("Done!");
                     } else {
-                        Console.WriteLine("Something went wrong...");
+                        Console.Write("Something went wrong...");
                     }
+                    Console.ReadLine();
                 }
                 return result ? CommandHelpers.Success : CommandHelpers.Failure;
             } 

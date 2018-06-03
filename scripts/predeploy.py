@@ -7,7 +7,7 @@ from pkg_resources import parse_version
 
 def get_existing_versions():
     git_tags = subprocess.check_output(["git", "tag"]).split()
-    return [x for x in git_tags if x.replace(".", "").isdigit()]
+    return [x for x in git_tags]
 
 def get_new_version(source_path):
     with open(source_path) as source_file:

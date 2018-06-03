@@ -12,9 +12,6 @@ namespace StardewValley.MPSaveEditor.Commands {
 
     [Command(Name = "AddPlayers", Description = "Add Players", ThrowOnUnexpectedArgument = false)]
     public class AddPlayersCommand {
-
-
-
         public int newCabinCount {get; set;}
         
         public string saveFilePath { get; set; }        
