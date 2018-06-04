@@ -37,22 +37,22 @@ namespace StardewValley.MPSaveEditor.Models {
             FarmhandsInStorage = _farmhands.Select(x => new Farmhand(x, inGame:false));
         }
 
-        public bool AddFarmhand(Farmhand farmhand = null) {
-            if (farmhand == null) {
-                var cabin = _game.CreateNewCabin();
-                return cabin != null;
-            } else {
-                var cabin = _game.FindEmptyCabin();                               
-                if (cabin == null) {
-                    cabin = _game.CreateNewCabin(farmhand.Cabin);
-                    if (cabin == null)
-                        return false;
-                }  
-                cabin.SwitchCabin(farmhand.Cabin);
-                farmhand.Cabin = cabin;    
-                RemoveFarmhandFromStorage(farmhand);                        
-                return true;
-            }
+        public bool AddFarmhand(Farmhand farmhand) {
+            var cabin = _game.FindEmptyCabin();                               
+            if (cabin == null) {
+                cabin = _game.CreateNewCabin(farmhand.Cabin);
+                if (cabin == null)
+                    return false;
+            }  
+            cabin.SwitchCabin(farmhand.Cabin);
+            farmhand.Cabin = cabin;    
+            RemoveFarmhandFromStorage(farmhand);                        
+            return true;
+        }
+
+        public bool AddFarmhand(int cabinType) {
+            var cabin = _game.CreateNewCabin(cabinType);
+            return cabin != null;
         }
 
         public void StoreFarmhand(Farmhand farmhand) {
@@ -126,6 +126,8 @@ namespace StardewValley.MPSaveEditor.Models {
 
     public class Farmhand {
         public string Name => Cabin.Farmhand.Element("name").IsEmpty ? null : Cabin.Farmhand.Element("name").Value;
+        public string Farm => Cabin.Farmhand.Element("farmName").IsEmpty ? null : Cabin.Farmhand.Element("farmName").Value;
+        public string FavoriteThing => Cabin.Farmhand.Element("favoriteThing").IsEmpty ? null : Cabin.Farmhand.Element("favoriteThing").Value;
         public string UniqueMultiplayerId => Cabin.Farmhand.Element("UniqueMultiplayerID").IsEmpty ? null : Cabin.Farmhand.Element("UniqueMultiplayerID").Value;
         public Cabin Cabin {get;set;}
         public bool InGame  {get;set;}

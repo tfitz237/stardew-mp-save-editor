@@ -4,17 +4,20 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 
+
 namespace StardewValley.MPSaveEditor.Models {
     public class Cabin {
+        static Dictionary<int, String> cabinTypes = new Dictionary<int,String>{[1] = "Log Cabin", [2] = "Stone Cabin", [3] = "Plank Cabin"};
         private Random random = new Random();
         private String templatePath = AppContext.BaseDirectory + "\\template\\template";
         public XElement Element { get; set; }
-        public Cabin(XElement cabin = null) {
-            if (cabin == null) {
-                CreateCabin();
-            } else {
-                Element = cabin;
-            }
+
+        public Cabin(XElement cabin) {
+            Element = cabin;
+        }
+
+        public Cabin(int cabinType) {
+            CreateCabin(cabinType);
         }
 
         public int TileX { 
@@ -37,14 +40,14 @@ namespace StardewValley.MPSaveEditor.Models {
         public int Width => Int32.Parse(Element.Element("tilesWide").Value);
 
 
-        public void CreateCabin() {
+        public void CreateCabin(int cabinType) {
             XDocument template = XDocument.Load(templatePath);
             var blankCabin = template.Element("template")
                 .Element("Building");
             Element = new XElement(blankCabin);
             ReplaceCabinName();
-            ReplaceMultiplayerId();            
-            ReplaceCabinType();
+            ReplaceMultiplayerId();
+            ReplaceCabinType(cabinType);
         }
 
         public void ReplaceCabinName() {
@@ -62,10 +65,9 @@ namespace StardewValley.MPSaveEditor.Models {
                 .Value= uniqueMultiplayerId.ToString();
         }
 
-        public void ReplaceCabinType() {
-            List<String> cabinTypes = new List<String>(new String[] {"Log Cabin", "Stone Cabin", "Plank Cabin"});
-            var cabinType = cabinTypes[random.Next(0, 3)];
-            Element.Element("buildingType").Value = cabinType;
+        public void ReplaceCabinType(int cabinType) {
+            var cabinTypeName = cabinTypes.TryGetValue(cabinType, out var value) ? value : cabinTypes[random.Next(1, 4)];
+            Element.Element("buildingType").Value = cabinTypeName;
         }
 
         public void UpdateFarmhand(XElement host) {

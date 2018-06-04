@@ -1,3 +1,5 @@
+// Deprecated: see SwitchFarmhandByHost in FarmhandMangement.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

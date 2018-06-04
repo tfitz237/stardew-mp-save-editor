@@ -1,3 +1,5 @@
+// Deprecated: see RemoveFarmhand in FarmhandManagement.
+
 using System;
 using System.Collections.Generic;
 using System.IO;

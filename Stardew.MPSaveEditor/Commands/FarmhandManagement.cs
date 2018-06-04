@@ -66,8 +66,14 @@ namespace StardewValley.MPSaveEditor.Commands
             var farmhands = SelectFarmhands(1, inGame:false, hideBlank:true);
             var farmhandNumber = Prompt.GetInt(Purpose[PurposeEnum.AddToGame], 1);
             if (farmhandNumber == 1) {
+                Console.WriteLine("Cabin Types:");
+                Console.WriteLine("1. Log Cabin");
+                Console.WriteLine("2. Stone Cabin");
+                Console.WriteLine("3. Plank Cabin");
+                Console.WriteLine("4. Random");
+                var cabinType = Prompt.GetInt("Select a cabin type for the new cabin:", 4);
                 Console.WriteLine("Adding new cabin and player slot...");
-                success = _farmhands.AddFarmhand();
+                success = _farmhands.AddFarmhand(cabinType);
                 if (!success) {
                     Console.WriteLine("We had trouble finding a valid spot for the new cabin.");
                 }
@@ -148,7 +154,7 @@ namespace StardewValley.MPSaveEditor.Commands
             var farmhandCount = startingIndex;
             IEnumerable<Farmhand> farmhands; 
             if (inGame == true) {
-                farmhands =  _farmhands.FarmhandsInGame;    
+                farmhands =  _farmhands.FarmhandsInGame;
             } else if (inGame == false) {
                 farmhands = _farmhands.FarmhandsInStorage;
             } else {
@@ -160,7 +166,13 @@ namespace StardewValley.MPSaveEditor.Commands
             }
             foreach (var fh in farmhands) {
                 farmhandCount++;
-                Console.WriteLine(string.Format("{0}. {1}", farmhandCount, fh.Name ?? "<No Farmhand (Empty Cabin)>"));        
+                string farmhandID; 
+                if (fh.Name is null) {
+                    farmhandID = "<No Farmhand (Empty Cabin)>";
+                } else {
+                    farmhandID = string.Format("{0} - {1} Farm - Favorite Thing: {2}", fh.Name, fh.Farm, fh.FavoriteThing);
+                }
+                Console.WriteLine(string.Format("{0}. {1}", farmhandCount, farmhandID));        
             }
             return farmhands;
         }

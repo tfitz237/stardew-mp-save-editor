@@ -1,12 +1,12 @@
 # Stardew Valley Farmhand Management
-This utility is a stand alone save editor which allows users to add and manage more than four players in a multiplayer save file from Stardew Valley. No mods such as SMAPI are required for this functionality, and up to 8 players can be added to a vanilla multiplayer game.
+This utility is a stand alone save editor which allows users to add and manage more than four players in a multiplayer save file from Stardew Valley. No modifications or frameworks for Stardew Valley, such as SMAPI, are required for this functionality, and up to 8 players can be added to a vanilla multiplayer game.
 
 [![Build Status](https://travis-ci.org/tfitz237/stardew-mp-save-editor.svg?branch=master)](https://travis-ci.org/tfitz237/stardew-mp-save-editor)
 
 ## Getting Started
 Run this application from a terminal, all necessary runtimes and dependencies will be included in the release.
 
-The utility will search for saved files in the default save location for Stardew Valley saves:  "%USERNAME%/AppData/Roaming/Stardew Valley/Saves" on Windows and /home/$USERNAME/.config/StardewValley/Saves on Unix systems.
+The utility will search for saved files in the default save location for Stardew Valley saves:  "%USERNAME%/AppData/Roaming/Stardew Valley/Saves" on Windows and "home/$USERNAME/.config/StardewValley/Saves" on Unix systems.
 
 ### Prerequisites
 To run from source, you must have [Dotnet Core CLI](https://docs.microsoft.com/en-us/dotnet/core/tools/?tabs=netcore) installed.
@@ -32,6 +32,3 @@ Swaps the host slot with one of the farmhands in the save file.
 
 #### Swap Farmhand in Storage
 Swaps a farmhand from the save file with a farmhand in storage.
-
-#### Finding the Saved Games
-
