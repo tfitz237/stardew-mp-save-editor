@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,60 +11,48 @@ namespace StardewValley.MPSaveEditor.Models {
         private string _fileName {get;set;}
         private XDocument _doc { get; set;}
         private IEnumerable<XElement> _farmhands { get; set; }
+
         public Farmhands(SaveGame game) 
         {
             _game = game;
             FindFarmhands(game);
         }
-
-
-
-
+        
         public void FindFarmhands(SaveGame game) {
             var farmhandNames = game.FarmhandNames.ToList();
+            // Add host to list of farmhands and move them to the top
             farmhandNames.Add(game.Host.Element("name").Value);
             Swap(farmhandNames, 0, farmhandNames.Count() - 1);
-            var fileName = "";
-            var hasFarmhands = false;
-            foreach(var farmhand in farmhandNames) {
-                fileName = $"{farmhand}_{game.UniqueId}_farmhands";
-                hasFarmhands = LoadFile(fileName);
-                if (hasFarmhands)                                         
-                    break;
+            // Check if farmhand storage exists, create it if it doesn't, and load farmhands from storage.
+            var storageFileName = "stored_farmhands";
+            if (!LoadFile(storageFileName)) {
+                new XDocument(new XElement("Farmhands")).Save($"./farmhands/{storageFileName}");
+                LoadFile(storageFileName);
             }
-            if (!hasFarmhands) {
-                    _doc = new XDocument(new XElement("Farmhands"));                
-                    _farmhands = _doc.Element("Farmhands")?.Elements();   
-                    _fileName = $"{game.Host.Element("name").Value}_{game.UniqueId}_farmhands";;
-            } else {
-                _fileName = fileName;
-            }
-            
             PopulateFarmhands();
         }
 
         public void PopulateFarmhands() {
             FarmhandsInGame = _game.Cabins.Select(x => new Farmhand(x, inGame:true, isCabin: true));
             FarmhandsInStorage = _farmhands.Select(x => new Farmhand(x, inGame:false));
-
         }
 
-        public bool AddFarmhand(Farmhand farmhand = null) {
-            if (farmhand == null) {
-                var cabin = _game.CreateNewCabin();
-                return cabin != null;
-            } else {
-                var cabin = _game.FindEmptyCabin();                               
-                if (cabin == null) {
-                    cabin = _game.CreateNewCabin(farmhand.Cabin);
-                    if (cabin == null)
-                        return false;
-                }  
-                cabin.SwitchCabin(farmhand.Cabin);
-                farmhand.Cabin = cabin;    
-                RemoveFarmhandFromStorage(farmhand);                        
-                return true;
-            }
+        public bool AddFarmhand(Farmhand farmhand) {
+            var cabin = _game.FindEmptyCabin();                               
+            if (cabin == null) {
+                cabin = _game.CreateNewCabin(farmhand.Cabin);
+                if (cabin == null)
+                    return false;
+            }  
+            cabin.SwitchCabin(farmhand.Cabin);
+            farmhand.Cabin = cabin;    
+            RemoveFarmhandFromStorage(farmhand);                        
+            return true;
+        }
+
+        public bool AddFarmhand(int cabinType) {
+            var cabin = _game.CreateNewCabin(cabinType);
+            return cabin != null;
         }
 
         public void StoreFarmhand(Farmhand farmhand) {
@@ -83,6 +69,7 @@ namespace StardewValley.MPSaveEditor.Models {
                 farmhand.Cabin.Element.Remove();
             }
         }
+
         public void RemoveFarmhandFromCabin(Farmhand farmhand, bool storeFarmhand = true, bool removeCabin = false) {
             if (farmhand.InGame) {
                 if (storeFarmhand) {
@@ -105,7 +92,6 @@ namespace StardewValley.MPSaveEditor.Models {
         }
 
 
-
         public IEnumerable<Farmhand> AllFarmhands => FarmhandsInStorage.Concat(FarmhandsInGame);
         public IEnumerable<Farmhand> FarmhandsInStorage {get;set;}
 
@@ -114,7 +100,8 @@ namespace StardewValley.MPSaveEditor.Models {
         public bool LoadFile(string fileName) {
             try {
                 _doc = XDocument.Load($"./farmhands/{fileName}");
-                _farmhands = _doc.Element("Farmhands")?.Elements();               
+                _farmhands = _doc.Element("Farmhands")?.Elements();
+                _fileName = fileName;
                 if (_farmhands == null || !_farmhands.Any()) {
                     return false;
                 }
@@ -138,19 +125,18 @@ namespace StardewValley.MPSaveEditor.Models {
     }
 
     public class Farmhand {
-
         public string Name => Cabin.Farmhand.Element("name").IsEmpty ? null : Cabin.Farmhand.Element("name").Value;
+        public string Farm => Cabin.Farmhand.Element("farmName").IsEmpty ? null : Cabin.Farmhand.Element("farmName").Value;
+        public string FavoriteThing => Cabin.Farmhand.Element("favoriteThing").IsEmpty ? null : Cabin.Farmhand.Element("favoriteThing").Value;
+        public string UniqueMultiplayerId => Cabin.Farmhand.Element("UniqueMultiplayerID").IsEmpty ? null : Cabin.Farmhand.Element("UniqueMultiplayerID").Value;
         public Cabin Cabin {get;set;}
-
         public bool InGame  {get;set;}
-
         public bool InStorage {get;set;}
-
+        
         public Farmhand(XElement element, bool inGame, bool isCabin = false) {
             InGame = inGame;
             InStorage = !InGame;
             Cabin = new Cabin(element);
         }
     }
-
 }

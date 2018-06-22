@@ -1,3 +1,5 @@
+// Deprecated: see AddFarmHand in FarmhandManagement.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,9 +14,6 @@ namespace StardewValley.MPSaveEditor.Commands {
 
     [Command(Name = "AddPlayers", Description = "Add Players", ThrowOnUnexpectedArgument = false)]
     public class AddPlayersCommand {
-
-
-
         public int newCabinCount {get; set;}
         
         public string saveFilePath { get; set; }        
@@ -26,7 +25,8 @@ namespace StardewValley.MPSaveEditor.Commands {
                 var game = new SaveGame(saveFilePath);
                 while (newCabinCount > 0) {
                     var cabins = game.Cabins;
-                    game.CreateNewCabin();
+                    // Default to Log Cabin. Doesn't matter, AddPlayer is deprecated.
+                    game.CreateNewCabin(1);
                     newCabinCount--;
                 }
 

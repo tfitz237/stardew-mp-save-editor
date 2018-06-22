@@ -56,7 +56,6 @@ namespace StardewValley.MPSaveEditor.Commands
                 SelectFarmhands(0, inGame:true, hideBlank:false);
                 Console.WriteLine("Current farmhands in storage: ");
                 SelectFarmhands(0, inGame:false, hideBlank:true);
-                Console.ReadLine();
                 return true;
         }
         public bool AddFarmhand() {
@@ -67,8 +66,14 @@ namespace StardewValley.MPSaveEditor.Commands
             var farmhands = SelectFarmhands(1, inGame:false, hideBlank:true);
             var farmhandNumber = Prompt.GetInt(Purpose[PurposeEnum.AddToGame], 1);
             if (farmhandNumber == 1) {
+                Console.WriteLine("Cabin Types:");
+                Console.WriteLine("1. Log Cabin");
+                Console.WriteLine("2. Stone Cabin");
+                Console.WriteLine("3. Plank Cabin");
+                Console.WriteLine("4. Random");
+                var cabinType = Prompt.GetInt("Select a cabin type for the new cabin:", 4);
                 Console.WriteLine("Adding new cabin and player slot...");
-                success = _farmhands.AddFarmhand();
+                success = _farmhands.AddFarmhand(cabinType);
                 if (!success) {
                     Console.WriteLine("We had trouble finding a valid spot for the new cabin.");
                 }
@@ -108,7 +113,6 @@ namespace StardewValley.MPSaveEditor.Commands
             
         }
 
-        
         public bool SwitchFarmhandByHost() {
             Console.WriteLine("---------");
             Console.WriteLine("Choose a farmhand to change to the host of the saved game: ");
@@ -125,7 +129,6 @@ namespace StardewValley.MPSaveEditor.Commands
         public bool SwitchFarmhandByStorage() {
             if (!_farmhands.FarmhandsInStorage.Any()) {
                 Console.WriteLine("No Farmhands found in storage for this save file.");
-                Console.ReadLine();
                 return false;
             }
             Console.WriteLine("---------");
@@ -146,13 +149,12 @@ namespace StardewValley.MPSaveEditor.Commands
             return success;
         }
 
-
         // Returns a list of Farmhands, while also printing that list to the console
        public IEnumerable<Farmhand> SelectFarmhands(int startingIndex, bool? inGame,  bool hideBlank) {
             var farmhandCount = startingIndex;
             IEnumerable<Farmhand> farmhands; 
             if (inGame == true) {
-                farmhands =  _farmhands.FarmhandsInGame;    
+                farmhands =  _farmhands.FarmhandsInGame;
             } else if (inGame == false) {
                 farmhands = _farmhands.FarmhandsInStorage;
             } else {
@@ -164,14 +166,19 @@ namespace StardewValley.MPSaveEditor.Commands
             }
             foreach (var fh in farmhands) {
                 farmhandCount++;
-                Console.WriteLine(string.Format("{0}. {1}", farmhandCount, fh.Name ?? "<No Farmhand (Empty Cabin)>"));        
+                string farmhandID; 
+                if (fh.Name is null) {
+                    farmhandID = "<No Farmhand (Empty Cabin)>";
+                } else {
+                    farmhandID = string.Format("{0} - {1} Farm - Favorite Thing: {2}", fh.Name, fh.Farm, fh.FavoriteThing);
+                }
+                Console.WriteLine(string.Format("{0}. {1}", farmhandCount, farmhandID));        
             }
             return farmhands;
         }
 
         public int OnExecute() {
             try {
-
                 saveFilePath = CommandHelpers.GetSaveFile(CommandHelpers.GetSaveFolder());
                 var saveGame = new SaveGame(saveFilePath);
                 bool done = false;
@@ -179,10 +186,11 @@ namespace StardewValley.MPSaveEditor.Commands
                 while (!done) {
                     result = SelectProgram(saveGame, out done);
                     if (result) {
-                        Console.WriteLine("Done!");
+                        Console.Write("Done!");
                     } else {
-                        Console.WriteLine("Something went wrong...");
+                        Console.Write("Something went wrong...");
                     }
+                    Console.ReadLine();
                 }
                 return result ? CommandHelpers.Success : CommandHelpers.Failure;
             } 

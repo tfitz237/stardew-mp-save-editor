@@ -76,11 +76,7 @@ namespace StardewValley.MPSaveEditor.Models {
             .Select(x => 
                 x.Element("name").Value);
         
-        public Cabin CreateNewCabin(Cabin cabin = null) {
-            if (cabin == null) {
-                cabin = new Cabin();
-                cabin.CreateCabin();
-            }
+        public Cabin CreateNewCabin(Cabin cabin) {
             cabin.UpdateFarmhand(Host);
             UpdateHost();
             var moved = MoveToValidLocation(cabin);
@@ -89,6 +85,10 @@ namespace StardewValley.MPSaveEditor.Models {
                 return cabin;
             }
             return null;
+        }
+
+        public Cabin CreateNewCabin(int cabinType) {
+                return CreateNewCabin(new Cabin(cabinType));
         }
             
         public void SaveFile(bool overwriteSaveFile = false) {
@@ -108,7 +108,7 @@ namespace StardewValley.MPSaveEditor.Models {
             var moved = objects.MoveToValidLocation(cabin);
             if (!moved) {
                 Console.WriteLine("There were no valid locations found for the new cabin on your farm.");
-            } 
+            }
             return moved;
         }
 

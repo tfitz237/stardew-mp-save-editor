@@ -1,20 +1,18 @@
 language: csharp
+dotnet: 2.1
 mono: none
-dotnet: 2.1.200
+
 script:
-- if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./scripts/build.sh; fi
-- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash ./scripts/deploy.sh; fi
+  - bash ./scripts/test.sh;
+  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./scripts/build.sh; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash ./scripts/deploy.sh; fi
+
 before_deploy:
-  - bash ./scripts/predeploy.sh
-branch:
-   only:
-      - master
-#deploy:
-#  provider: releases
-#  api_key:
-#    secure: 1LKQ63NWNM4jgRxBzHHESZ+ultLP8O40uECwv3vAgb//9qlpw8q5NCshYp3qUFCneQP6iY6yo6x6eU7qweLmRcUjD8wqveuaizIeGZ41ItRd0wClOcqKXZxfhXAveZiDkS+lwIK2T9nGxJQscmXbe1zAx6T4F7d4tRF+FwyDg7m7foSmTNMKdWZJd1eY7Hte8J0VpfvYuZMCzhjdYFlhFzgE6cvxIP22BSuxts/dVXAogHWdWyughWUWme4xDAPWMgwLvrjnydpUryGFLAlnk+ImysNmFkiauXCSF6Mgcrq7WPSAgsjrUscBDHebnb8AMn/umbFEuVoqe/ZyZ3ENfiatMw6X54Xzh64UGqs/u3p7nM1HuFR4r/mZUoqDh7FyIG4PCu9molhgBGIBNaNq6tceQiekWhrS++L2AhRDhBCZ6hL5Xl2JbDw63fjCoFBNtHJGLIqlITac31smOG5+sCcK/shOGOP+41Q4CXbcL8xS+hendrX6JadHnz5MJCFnLVfLxFaEJl1bJupdbHY9QiGZJh4aXX5OtuxDm5vV4Rwepi0K+Vc9TTHgRKELlqZWU3Qp4B4ycbw+83rxbEnKDnGAUwQilRPZxBUMf9rjMOWn3HMuhc9t/Hlr2alUxlEQmGVS7UbgEl2Z4HvJ0HUH8RUvHAwK3ssITvHl+np5TAc=
-#  file: "$TRAVIS_BUILD_DIR/releases/Stardew.MPSaveEditor-$TRAVIS_BUILD_ID.zip"
-#  tag: "$(git describe --tags)"
-#  on:
-#    tag: true
-a
+  - python ./scripts/predeploy.py
+
+deploy:
+  provider: releases
+  api_key:
+    secure: PdDcyu9JGcYeWCCfpHxA597iSzQPSj/p6MK+bGsI0cpJW7Yrvp+BcIJ0hindfVNOXiodxcAKHwx/PJFE4G6YoPkJTVmVobUE1xhCci+20IyJqBGTT2u33icVTYJbI0sDLk9IIuUTyK1LyRszd0KMTQNB6W7cBIycXtdGH7Nvg09QnY3yo5dE2bLZZu8RvFkiA0nhzcSPEUth7fJc+2X/2V9Xgtkpaykrn77yMzGymUi8m9DThDuN1SKPGep1HULdolHWd2iDDGeDiYGy1IxwajynKPw3scGijf0jTuoGcQC3fpUXHsPaVaRdTa1esYitD+UGiQ51tXrwPJ6Jn4NxM8P248t7O7/+ie3kQtOP33ciBKclgqHKkzB+o6pMCoY4tgtOGRx1kd+bUmhepGn50aj9wAbfM1W+9p0hiDVYbHIouI0Kg6fCQv1BhgRdElz7hqtXY7x1AHz1BJRVNAiQwac7XM3BMx7vBJb2XyHMM26wET7OOfKTTRtmybT5r5ONpbpLe/BHeuM7M3RphUmV28p8JFvwzd80DMXl7pIhujarNsREm0MGc8KnhW6MZLkAJnZl9k3XMBvmzyLgXCJVutoDw0Bb5t4KCkvOKSS06amC4YQg02jzBwipUC1Cp310HcPDG93tzvkLR279Lz3y7wRly/gKhDyVJchk44/vIrg=  
+  file: "$TRAVIS_BUILD_DIR/releases/Stardew.MPSaveEditor-$TRAVIS_BUILD_ID.zip"
+  skip_cleanup: true
