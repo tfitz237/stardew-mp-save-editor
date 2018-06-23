@@ -39,6 +39,7 @@ namespace StardewValley.MPSaveEditor.Helpers
                     saveFiles.Add(fileCount, saveFilePath);
                     Console.WriteLine(String.Format("{0}. {1}", fileCount, saveFileName));
                 }
+                Directory.CreateDirectory("./saves");
                 foreach (String saveFolder in Directory.GetDirectories("./saves")) {
                     fileCount++;
                     String saveFileName = Regex.Matches(saveFolder, @"\\([^\\]*)_")[0].Groups[1].ToString();
