@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -26,6 +27,7 @@ namespace StardewValley.MPSaveEditor.Models {
             // Check if farmhand storage exists, create it if it doesn't, and load farmhands from storage.
             var storageFileName = "stored_farmhands";
             if (!LoadFile(storageFileName)) {
+                Directory.CreateDirectory("./farmhands");
                 new XDocument(new XElement("Farmhands")).Save($"./farmhands/{storageFileName}");
                 LoadFile(storageFileName);
             }

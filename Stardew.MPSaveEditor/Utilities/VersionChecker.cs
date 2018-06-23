@@ -17,6 +17,9 @@ namespace StardewValley.MPSaveEditor.Utilities {
             currentVersion = currentVersion.Replace("v", "");
             var response = this.getReleases();
             var latestVersion = this.parseResponse(response);
+            if (latestVersion == "FAILED") {
+                return "There was a problem checking the latest release. Please goto https://github.com/tfitz237/stardew-mp-save-editor/releases to see if there is a newer version";
+            }
             result = this.compareVersions(currentVersion, latestVersion);
             return result;
         }
@@ -41,7 +44,10 @@ namespace StardewValley.MPSaveEditor.Utilities {
                 versionStatus = release.tagName.Replace("v", "");
             }
             catch (SerializationException) {
-                versionStatus = "Request for the latest release information failed.";
+                versionStatus = "FAILED";
+            }
+            catch (NullReferenceException) {
+                versionStatus = "FAILED";
             }
             return versionStatus;
         }
