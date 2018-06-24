@@ -6,6 +6,7 @@ env:
   win_x86=win-x86
   win_x64=win-x64
   linux_x64=linux-x64
+  osx_x64=osx-x64
 
 script:
   - bash ./scripts/test.sh;
@@ -23,6 +24,5 @@ deploy:
     - "$TRAVIS_BUILD_DIR/releases/Stardew.MPSaveEditor-$TRAVIS_BUILD_ID-${win_x86}.zip"
     - "$TRAVIS_BUILD_DIR/releases/Stardew.MPSaveEditor-$TRAVIS_BUILD_ID-${win_x64}.zip"
     - "$TRAVIS_BUILD_DIR/releases/Stardew.MPSaveEditor-$TRAVIS_BUILD_ID-${linux_x64}.zip"
+    - "$TRAVIS_BUILD_DIR/releases/Stardew.MPSaveEditor-$TRAVIS_BUILD_ID-${osx_x64}.zip"
   skip_cleanup: true
-  on:
-    all_branches: true
