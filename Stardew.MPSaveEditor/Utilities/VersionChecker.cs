@@ -16,47 +16,48 @@ namespace StardewValley.MPSaveEditor.Utilities {
         public String run(String currentVersion) {
             String result;
             currentVersion = currentVersion.Replace("v", "");
-            var response = this.getReleases();
-            var latestVersion = this.parseResponse(response);
-            // Need to have a separate path if the version is not valid or a try catch + raise exception from parseResponse.
-            if (latestVersion == "FAILED") {
-                return "There was a problem checking the latest release. Please goto https://github.com/tfitz237/stardew-mp-save-editor/releases to see if there is a newer version";
+            try {
+                Stream response = this.getReleases();
+                String latestVersion = this.parseResponse(response);
+                result = this.compareVersions(currentVersion, latestVersion);
             }
-            result = this.compareVersions(currentVersion, latestVersion);
+            catch (Exception exception) {
+                result = "There was a problem checking the latest release.";
+                Console.WriteLine(exception);
+            }
             return result;
         }
         
         private Stream getReleases() {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/tfitz237/stardew-mp-save-editor/releases");
+            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/tfitz237/stardew-mp-save-editor/releases");
             requestMessage.Headers.Add("User-Agent", "sd-mp-save-editor");
             var response = gitClient.SendAsync(requestMessage);
-            Stream responseBody = response.Result.Content.ReadAsStreamAsync().Result;
-            if (!response.IsCompletedSuccessfully) {
-                responseBody = new MemoryStream();
+            Stream responseBody;
+            if (response.Result.ReasonPhrase == "OK") {
+                responseBody = response.Result.Content.ReadAsStreamAsync().Result;
+            }
+            else {
+                throw new Exception("Failed to get release information from Git.");
             }
             return responseBody;
         }
 
         private String parseResponse(Stream responseBody) {
             String versionStatus = "0.0.0.0";
-            try {
-                Regex regex = new Regex("\"tag_name\":\"([^,]*)\"");
-                StreamReader responseReader = new StreamReader(responseBody);
-                String responseText = responseReader.ReadToEnd();
-                MatchCollection matches = regex.Matches(responseText);
-                foreach (Match match in matches) {
-                    String gitRelease = match.Groups[1].Value.Replace("v", "");
-                    Version releaseVersion = new Version(gitRelease);
+            Regex regex = new Regex("\"tag_name\":\"([^,]*)\"");
+            StreamReader responseReader = new StreamReader(responseBody);
+            String responseText = responseReader.ReadToEnd();
+            MatchCollection matches = regex.Matches(responseText);
+            if (matches.Count == 0) {
+                throw  new Exception("Unable to find release version tags, check the Git API.");
+            }
+            foreach (Match match in matches) {
+                String gitRelease = match.Groups[1].Value.Replace("v", "");
+                if (Version.TryParse(gitRelease, out Version releaseVersion)) {
                     if (releaseVersion.CompareTo(new Version(versionStatus)) > 0) {
                         versionStatus = gitRelease;
                     }
                 }
-            }
-            catch (SerializationException) {
-                versionStatus = "FAILED";
-            }
-            catch (NullReferenceException) {
-                versionStatus = "FAILED";
             }
             return versionStatus;
         }
@@ -64,13 +65,16 @@ namespace StardewValley.MPSaveEditor.Utilities {
         private String compareVersions(String currentVersionName, String latestVersionName) {
             String versionStatus;
 
-            var currentVersion = new Version(currentVersionName);
-            var latestVersion = new Version(latestVersionName);
+            Version currentVersion = new Version(currentVersionName);
+            Version latestVersion = new Version(latestVersionName);
             if (latestVersion.CompareTo(currentVersion) > 0) {
-                versionStatus = String.Format("Version {0} of the Stardew Valley Multiplayer Save Editor is now available. You can download it from https://github.com/tfitz237/stardew-mp-save-editor/releases.", latestVersionName);
+                versionStatus = String.Format("Version {0} of the Stardew Valley Farmhand Managment System is now available. You can download it from https://github.com/tfitz237/stardew-mp-save-editor/releases.", latestVersionName);
+            }
+            else if (latestVersion.CompareTo(currentVersion) == 0) {
+            versionStatus = "You are running the latest version of the Stardew Valley Farmhand Managment System.";
             }
             else {
-            versionStatus = "You are running the latest version of the Stardew Valley Multiplayer Save Editor.";
+                throw new Exception("You are running an unreleased build or there was an error in the version checking process.");
             }
             return versionStatus;
         }

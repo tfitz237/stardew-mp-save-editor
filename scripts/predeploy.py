@@ -25,8 +25,3 @@ if all([parse_version(new_version) > parse_version(existing_version) for existin
 
     subprocess.call(["git", "config", "--local", "user.name", "\"Travis CI - Deploy\""])
     subprocess.call(["git", "config", "--local", "user.email", "\"travis@travisci.org\""])
-
-# May use this later to make logic more sophisticated
-# current_version_digits = find_current_version(versions).split(".")
-# current_version_digits[-1] = str(int(current_version_digits[-1]) + 1)
-# new_version = ".".join(current_version_digits)
