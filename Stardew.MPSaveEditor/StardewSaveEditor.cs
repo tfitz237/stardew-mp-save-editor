@@ -13,7 +13,7 @@ namespace StardewValley.MPSaveEditor
 {
     class StardewSaveEditor
     {   
-        static String VERSION = "v0.2.0";
+        static String VERSION = "v0.2.1";
         static Dictionary<int, string> Commands = new Dictionary<int, string> {
             { 0, "Farmhand Management System (FMS)"},
             { 1, "Close"}
