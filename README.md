@@ -1,6 +1,11 @@
 # Stardew Valley Farmhand Management
 This utility is a stand alone save editor which allows users to add and manage more than four players in a multiplayer save file from Stardew Valley. No modifications or frameworks for Stardew Valley, such as SMAPI, are required for this functionality, and up to 8 players can be added to a vanilla multiplayer game.
 
+
+# NOTICE
+## This save editor is more than likely no longer stable as it was created before Stardew Valley 1.5. USE AT YOUR OWN RISK. 
+
+
 [![Build Status](https://travis-ci.org/tfitz237/stardew-mp-save-editor.svg?branch=master)](https://travis-ci.org/tfitz237/stardew-mp-save-editor)
 
 ## Getting Started
